@@ -1,0 +1,7 @@
+Daemaged.Compression.GZip/obj/
+Daemaged.Compression.GZip/bin/
+zlib.interop/contrib/vstudio/vc9/x86
+zlib.interop/contrib/vstudio/vc9/x64
+zlib.interop/contrib/vstudio/vc9/*.user
+zlib.interop/contrib/vstudio/vc9/*.ncb
+zlib.interop/contrib/vstudio/vc9/*.suo
