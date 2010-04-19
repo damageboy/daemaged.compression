@@ -5,3 +5,12 @@ zlib.interop/contrib/vstudio/vc9/x64
 zlib.interop/contrib/vstudio/vc9/*.user
 zlib.interop/contrib/vstudio/vc9/*.ncb
 zlib.interop/contrib/vstudio/vc9/*.suo
+Daemaged.Comoression.GZip.Tests/obj/
+Daemaged.Compression.GZip.ConsoleTester/obj/
+Daemaged.Compression.GZip.opensdf
+Daemaged.Compression.GZip.sdf
+Daemaged.Compression.GZip.suo
+Daemaged.Compression/obj/
+SyncToy_e7977045-a955-4b9f-ba3f-e0c196f72052.dat
+bin/
+ipch/
