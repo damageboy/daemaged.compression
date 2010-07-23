@@ -30,6 +30,7 @@ namespace Daemaged.Compression.GZip
     private readonly GCHandle _tmpBufferHandle;
     private readonly unsafe void* _tmpBufferPtr;
     private bool _isClosed;
+    private bool _writeAfterReset;
 
     public GZipStream(Stream stream, CompressionMode mode) : 
       this(stream, mode, new GZipOptions())
@@ -147,7 +148,8 @@ namespace Daemaged.Compression.GZip
       _isClosed = true; 
       if (_mode == CompressionMode.Compress)
       {
-        Write(null, 0, ZLibFlush.Finish);
+        if (_writeAfterReset)
+          Write(null, 0, ZLibFlush.Finish);
         ZLibNative.deflateEnd(ref _zstream);
       } else 
         ZLibNative.inflateEnd(ref _zstream);
@@ -164,7 +166,9 @@ namespace Daemaged.Compression.GZip
       if (_isClosed)
         return;
       if (_mode == CompressionMode.Compress) {
-        Write(null, 0, ZLibFlush.Finish);
+        if (_writeAfterReset)
+          Write(null, 0, ZLibFlush.Finish);
+        _writeAfterReset = false;
         ZLibNative.deflateReset(ref _zstream);
       } else
         ZLibNative.inflateReset(ref _zstream);
@@ -224,12 +228,14 @@ namespace Daemaged.Compression.GZip
       if (_mode == CompressionMode.Decompress)
         throw new NotSupportedException("Can't write on a decompress stream!");
 
+      // This indicates that we need to go through a "Finish" write when closing/reseting
+      _writeAfterReset = true;
+
       _zstream.avail_in = (uint)count;
       _zstream.next_in = buffer;
       uint availOut;
       do
       {
-
         var result = ZLibNative.deflate(ref _zstream, flush);
         availOut = _zstream.avail_out;
         if (availOut < BufferSize)
