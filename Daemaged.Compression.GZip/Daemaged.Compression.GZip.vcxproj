@@ -179,13 +179,13 @@
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">Daemaged.Compression.GZip</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Daemaged.Compression.GZip</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Daemaged.Compression.GZip</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Daemaged.Compression.GZip</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Daemaged.Compression</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Daemaged.Compression</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Daemaged.Compression</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">Daemaged.Compression.GZip</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">Daemaged.Compression.GZip</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">Daemaged.Compression.GZip</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Daemaged.Compression.GZip</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Daemaged.Compression</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">Daemaged.Compression.GZip</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -223,7 +223,7 @@
       <AdditionalDependencies>contrib\masmx86\gvmat32.obj;contrib\masmx86\inffas32.obj;..\bin\$(Configuration)-x86\Daemaged.Compression.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -255,7 +255,7 @@
       <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)\</ProgramDataBaseFileName>
       <BrowseInformation>
       </BrowseInformation>
       <WarningLevel>Level3</WarningLevel>
@@ -267,10 +267,10 @@
       <Culture>0x040c</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>contrib\masmx64\gvmat64.obj;contrib\masmx64\inffasx64.obj;..\bin\$(Configuration)-x64\Daemaged.Compression.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\xz\pkg\bin_x86-64\liblzma.a;contrib\masmx64\gvmat64.obj;contrib\masmx64\inffasx64.obj;..\bin\$(Configuration)-x64\Daemaged.Compression.Managed.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -321,7 +321,7 @@
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>$(OutDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(OutDir)\$(TargetName).map</MapFileName>
@@ -370,7 +370,7 @@
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>$(OutDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(OutDir)\$(TargetName).map</MapFileName>
@@ -422,7 +422,7 @@
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>$(OutDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(OutDir)\$(TargetName).map</MapFileName>
@@ -470,11 +470,11 @@
       <Culture>0x040c</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>contrib\masmx64\gvmat64.obj;contrib\masmx64\inffasx64.obj;..\bin\$(Configuration)-x64\Daemaged.Compression.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\xz\pkg\bin_x86-64\liblzma.a;contrib\masmx64\gvmat64.obj;contrib\masmx64\inffasx64.obj;..\bin\$(Configuration)-x64\Daemaged.Compression.Managed.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -522,7 +522,7 @@
     <Link>
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -569,7 +569,7 @@
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>$(OutDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(OutDir)\$(TargetName).map</MapFileName>
@@ -615,7 +615,7 @@
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>$(OutDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(OutDir)\$(TargetName).map</MapFileName>

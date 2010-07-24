@@ -122,8 +122,8 @@ namespace Daemaged.Compression.GZip
 
   public static class ZLibNative
   {
-#if ZLIB_MIXED_MODE
-    internal const string ZLIB = "Daemaged.Compression.GZip.dll";
+#if MIXED_MODE
+    internal const string ZLIB = "Daemaged.Compression.dll";
 #else
     internal const string ZLIB = "libz";
 #endif

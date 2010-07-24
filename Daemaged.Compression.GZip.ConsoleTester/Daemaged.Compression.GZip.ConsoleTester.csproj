@@ -70,10 +70,7 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Daemaged.Compression.GZip, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b3a9ec458dbe17ef, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\$(Configuration)-$(Platform)\Daemaged.Compression.GZip.dll</HintPath>
-    </Reference>
+    <Reference Include="Daemaged.Compression, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b3a9ec458dbe17ef, processorArchitecture=AMD64" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
