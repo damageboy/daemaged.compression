@@ -176,7 +176,12 @@ namespace Daemaged.Compression.LZMA
 
 
 
+#if AMD64
   [StructLayout(LayoutKind.Sequential, Pack = 8)]
+#endif
+#if I386
+  [StructLayout(LayoutKind.Sequential, Pack = 4)]
+#endif
   public unsafe struct LZMAStreamNative
   {
     internal void* next_in; /** Pointer to the next input byte. */
@@ -598,7 +603,12 @@ namespace Daemaged.Compression.LZMA
     LZMA_MF_BT4 = 0x14
   }
 
+#if AMD64
   [StructLayout(LayoutKind.Sequential, Pack = 8)]
+#endif
+#if I386
+  [StructLayout(LayoutKind.Sequential, Pack = 4)]
+#endif
   public unsafe class LZMAOptionLZMA
   {
     public LZMAOptionLZMA(uint preset)
