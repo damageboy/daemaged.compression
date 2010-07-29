@@ -111,6 +111,7 @@
     <Compile Include="GZip\GZipFileStream.cs" />
     <Compile Include="GZip\GZipOptions.cs" />
     <Compile Include="GZip\GZipStream.cs" />
+    <Compile Include="LZMA\LZMAHelper.cs" />
     <Compile Include="LZMA\LZMANative.cs" />
     <Compile Include="LZMA\LZMAStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

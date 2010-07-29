@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace Daemaged.Compression.LZMA
 {
@@ -15,36 +16,44 @@ namespace Daemaged.Compression.LZMA
 
 
   /// <summary>Provides methods and properties used to compress and decompress streams.</summary>
+  [SuppressUnmanagedCodeSecurity] 
   public class LZMAStream : Stream
   {
     private const int BufferSize = 16384;
 
-    private readonly Stream _compressedStream;
-    private readonly CompressionMode _mode;
+    private Stream _compressedStream;
+    private CompressionMode _mode;
 
-    private readonly unsafe LZMAStreamNative *_zstream;    
+    private unsafe LZMAStreamNative *_zstream;    
 
-    private readonly byte[] _tmpBuffer;
+    private byte[] _tmpBuffer;
     private GCHandle _tmpBufferHandle;
-    private readonly unsafe void *_tmpBufferPtr;
-    private readonly byte[] _zstreamBuff;
+    private unsafe void *_tmpBufferPtr;
+    private byte[] _zstreamBuff;
     private GCHandle _zstreamHandle;
+    private bool _wasWrittenTo;
     private bool _isDisposed;
 
-    private readonly LZMAFilter[] _filters;
-    private readonly LZMAOptionLZMA _options;
-    private readonly GCHandle _optionsHandle;
-    private GCHandle _filtersHandle;
     private bool _isClosed;
 
 
-    public LZMAStream(Stream stream, CompressionMode mode) : this(stream, mode, null) {}
+    public unsafe LZMAStream(Stream stream, CompressionMode mode) : this(stream, mode,  null) {}
 
     /// <summary>Initializes a new instance of the GZipStream class using the specified stream and BZip2CompressionMode value.</summary>
     /// <param name="stream">The stream to compress or decompress.</param>
     /// <param name="mode">One of the BZip2CompressionMode values that indicates the action to take.</param>
     /// <param name="opts">The encodgin/decoding options</param>
-    public unsafe LZMAStream(Stream stream, CompressionMode mode, LZMAOptionLZMA opts)
+    public unsafe LZMAStream(Stream stream, CompressionMode mode, ref LZMAOptionLZMA opts)
+    {
+      fixed (LZMAOptionLZMA* o = &opts) {
+        Init(stream, mode, o);
+      }
+    }
+
+    public unsafe LZMAStream(Stream stream, CompressionMode mode, LZMAOptionLZMA *opts)
+    { Init(stream, mode, opts); }
+
+    public unsafe void Init(Stream stream, CompressionMode mode, LZMAOptionLZMA *opts)
     {
       _compressedStream = stream;
       _mode = mode;
@@ -62,23 +71,20 @@ namespace Daemaged.Compression.LZMA
       LZMAStatus ret;
       switch (mode)
       {
-        case CompressionMode.Compress:
-          _optionsHandle = GCHandle.Alloc(opts, GCHandleType.Pinned);
-
+        case CompressionMode.Compress:          
           // We will always use one filter, + 1 to mark the end of the filter array
-          _filters = new LZMAFilter[2];
-          _filters[0].id = LZMANative.LZMA_FILTER_LZMA2;
-          _filters[0].options = _optionsHandle.AddrOfPinnedObject().ToPointer();
-          _filters[1].id = LZMANative.LZMA_VLI_UNKNOWN;
+          var filters = stackalloc LZMAFilter[2];
+          filters[0].id = LZMANative.LZMA_FILTER_LZMA2;
+          filters[0].options = opts;
+          filters[1].id = LZMANative.LZMA_VLI_UNKNOWN;
           
-          _filtersHandle = GCHandle.Alloc(_filters, GCHandleType.Pinned);
-          ret = LZMANative.lzma_stream_encoder(_zstream, (LZMAFilter*) _filtersHandle.AddrOfPinnedObject().ToPointer(), LZMACheck.LZMA_CHECK_CRC64);
+          ret = LZMANative.lzma_stream_encoder(_zstream, filters, LZMACheck.LZMA_CHECK_CRC64);
 
           if (ret != LZMAStatus.LZMA_OK)
             throw new ArgumentException(string.Format("Unable to init LZMA decoder. Return code: {0}", ret));
 
           _zstream->next_out = _tmpBufferPtr;
-          _zstream->avail_out = (IntPtr) _tmpBuffer.Length;
+          _zstream->avail_out = (IntPtr)_tmpBuffer.Length;
 
           break;
         case CompressionMode.Decompress:
@@ -168,6 +174,8 @@ namespace Daemaged.Compression.LZMA
       if (_mode == CompressionMode.Decompress)
         throw new NotSupportedException("Can't write on a decompress stream!");
 
+      _wasWrittenTo = true;
+
       _zstream->avail_in = (IntPtr)count;
       _zstream->next_in = buffer;
 
@@ -252,7 +260,7 @@ namespace Daemaged.Compression.LZMA
 
       // If we were compressing... There might be stuff left on the
       // temporary buffer
-      if (_mode == CompressionMode.Compress) {
+      if (_mode == CompressionMode.Compress && _wasWrittenTo) {
         Write(null, 0, LZMAAction.LZMA_FINISH);
       }
       LZMANative.lzma_end(_zstream);
@@ -260,10 +268,9 @@ namespace Daemaged.Compression.LZMA
       if (CloseUnderlyingStream)
         _compressedStream.Close();
       _tmpBufferHandle.Free();
-      if (_optionsHandle.IsAllocated) _optionsHandle.Free();
-      if (_filtersHandle.IsAllocated) _filtersHandle.Free();
       _zstreamHandle.Free();
       _isClosed = true;
+      _wasWrittenTo = false;
     }
 
     /// <summary>Gets a value indicating whether the stream supports reading while decompressing a file.</summary>
@@ -273,6 +280,15 @@ namespace Daemaged.Compression.LZMA
     {
       get { return 1; }
     }
+
+    /// <summary>
+    /// Total bytes read by LZMA
+    /// </summary>
+    public unsafe ulong TotalBytesIn { get { return _zstream->total_in; } }
+    /// <summary>
+    /// Total bytes written by LZMA
+    /// </summary>
+    public unsafe ulong TotalBytesOut { get { return _zstream->total_out; } }
 
     /// <summary>Gets a value indicating whether the stream supports writing.</summary>
     public override bool CanWrite { get { return (_mode == CompressionMode.Compress ? true : false); } }

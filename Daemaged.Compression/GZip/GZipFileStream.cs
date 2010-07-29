@@ -1,11 +1,13 @@
 using System;
 using System.IO;
+using System.Security;
 
 namespace Daemaged.Compression.GZip
 {
   /// <summary>
   /// Implements a compressed <see cref="Stream"/>, in GZip (.gz) format.
   /// </summary>
+  [SuppressUnmanagedCodeSecurity] 
   public class GZipFileStream : Stream
   {
     #region Private data

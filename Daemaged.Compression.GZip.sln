@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression", "Dae
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Comoression.GZip.Tests", "Daemaged.Comoression.GZip.Tests\Daemaged.Comoression.GZip.Tests.csproj", "{242EF5ED-640E-4193-B087-A5BE0FF777EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression.GZip.ConsoleTester", "Daemaged.Compression.GZip.ConsoleTester\Daemaged.Compression.GZip.ConsoleTester.csproj", "{174D6A1D-4738-4DE6-A897-66AEBBE93854}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression.ConsoleTester", "Daemaged.Compression.GZip.ConsoleTester\Daemaged.Compression.ConsoleTester.csproj", "{174D6A1D-4738-4DE6-A897-66AEBBE93854}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
 	EndProjectSection

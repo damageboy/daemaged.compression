@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace Daemaged.Compression.GZip
 {
@@ -14,6 +15,7 @@ namespace Daemaged.Compression.GZip
   }
 
   /// <summary>Provides methods and properties used to compress and decompress streams.</summary>
+  [SuppressUnmanagedCodeSecurity] 
   public class GZipStream : Stream
   {
     private const int BufferSize = 16384;

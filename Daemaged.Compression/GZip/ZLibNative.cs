@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 
 namespace Daemaged.Compression.GZip
@@ -120,6 +121,7 @@ namespace Daemaged.Compression.GZip
     Z_VERSION_ERROR = (-6),    
   }
 
+  [SuppressUnmanagedCodeSecurity] 
   public static class ZLibNative
   {
 #if MIXED_MODE
