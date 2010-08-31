@@ -187,6 +187,8 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">Daemaged.Compression.GZip</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Daemaged.Compression</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">Daemaged.Compression.GZip</TargetName>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -487,6 +489,7 @@
       <TargetMachine>MachineX64</TargetMachine>
       <KeyFile>..\Daemaged.Compression.snk</KeyFile>
       <CLRUnmanagedCodeCheck>true</CLRUnmanagedCodeCheck>
+      <DelaySign>false</DelaySign>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">
