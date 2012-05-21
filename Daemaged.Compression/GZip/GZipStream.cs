@@ -73,7 +73,7 @@ namespace Daemaged.Compression.GZip
           _zstream.avail_out = (uint) _tmpBuffer.Length;
           break;
         case CompressionMode.Decompress:
-          ret = ZLibNative.inflateInit2_(ref _zstream, ZLibOpenType.Both, ZLibVersion, Marshal.SizeOf(typeof(ZStream)));
+          ret = ZLibNative.inflateInit2_(ref _zstream, options.WindowBits, ZLibVersion, Marshal.SizeOf(typeof(ZStream)));
 
           if (ret != ZLibReturnCode.Ok)
             throw new ArgumentException("Unable to init ZLib. Return code: " + ret);

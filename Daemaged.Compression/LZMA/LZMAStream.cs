@@ -161,12 +161,7 @@ namespace Daemaged.Compression.LZMA
         }
       }
 
-      var bytesRead = (count - (int) _zstream->avail_out);
-      
-      if (bytesRead == 0)
-        throw new EndOfStreamException();
-
-      return bytesRead;
+      return (count - (int) _zstream->avail_out);          
     }
 
     private unsafe void Write(byte* buffer, int count, LZMAAction action)

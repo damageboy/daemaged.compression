@@ -75,6 +75,7 @@ namespace Daemaged.Compression.GZip
 
   public enum ZLibOpenType
   {
+    Raw = -15,
     ZLib = 15,
     GZip = 15 + 16,
     Both = 15 + 32,
@@ -148,7 +149,7 @@ namespace Daemaged.Compression.GZip
     public static extern unsafe ZLibReturnCode deflateInit2_ (ref ZStream sz, int  level, int  method, int windowBits, int memLevel, int strategy, string version, int stream_size);
 
     [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    public static extern unsafe ZLibReturnCode inflateInit2_(ref ZStream sz, ZLibOpenType windowBits, string version, int stream_size);
+    public static extern unsafe ZLibReturnCode inflateInit2_(ref ZStream sz, int windowBits, string version, int stream_size);
 
     [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
     public static extern ZLibReturnCode inflate(ref ZStream sz, ZLibFlush flush);

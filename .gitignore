@@ -14,3 +14,5 @@ Daemaged.Compression/obj/
 SyncToy_e7977045-a955-4b9f-ba3f-e0c196f72052.dat
 bin/
 ipch/
+*.user
+*.suo

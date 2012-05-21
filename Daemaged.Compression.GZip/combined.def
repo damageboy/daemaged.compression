@@ -72,7 +72,7 @@ EXPORTS
         inflateReset2                           @159
         inflateUndermine                        @160
 
-
+; lzma symbols
     lzma_alone_decoder
     lzma_alone_encoder
     lzma_auto_decoder
@@ -89,7 +89,6 @@ EXPORTS
     lzma_block_unpadded_size
     lzma_check_is_supported
     lzma_check_size
-    lzma_chunk_size
     lzma_code
     lzma_crc32
     lzma_crc64
@@ -167,3 +166,94 @@ EXPORTS
     lzma_vli_decode
     lzma_vli_encode
     lzma_vli_size        
+
+ ; LZO symbols
+    __lzo_init_v2
+    lzo1_99_compress
+    lzo1_compress
+    lzo1_decompress
+    lzo1_info
+    lzo1a_99_compress
+    lzo1a_compress
+    lzo1a_decompress
+    lzo1a_info
+    lzo1b_1_compress
+    lzo1b_2_compress
+    lzo1b_3_compress
+    lzo1b_4_compress
+    lzo1b_5_compress
+    lzo1b_6_compress
+    lzo1b_7_compress
+    lzo1b_8_compress
+    lzo1b_999_compress
+    lzo1b_999_compress_callback
+    lzo1b_99_compress
+    lzo1b_9_compress
+    lzo1b_compress
+    lzo1b_decompress
+    lzo1b_decompress_safe
+    lzo1c_1_compress
+    lzo1c_2_compress
+    lzo1c_3_compress
+    lzo1c_4_compress
+    lzo1c_5_compress
+    lzo1c_6_compress
+    lzo1c_7_compress
+    lzo1c_8_compress
+    lzo1c_999_compress
+    lzo1c_999_compress_callback
+    lzo1c_99_compress
+    lzo1c_9_compress
+    lzo1c_compress
+    lzo1c_decompress
+    lzo1c_decompress_safe
+    lzo1f_1_compress
+    lzo1f_999_compress
+    lzo1f_999_compress_callback
+    lzo1f_decompress
+    lzo1f_decompress_safe
+    lzo1x_1_11_compress
+    lzo1x_1_12_compress
+    lzo1x_1_15_compress
+    lzo1x_1_compress
+    lzo1x_999_compress
+    lzo1x_999_compress_dict
+    lzo1x_999_compress_internal
+    lzo1x_999_compress_level
+    lzo1x_decompress
+    lzo1x_decompress_dict_safe
+    lzo1x_decompress_safe
+    lzo1x_optimize
+    lzo1y_1_compress
+    lzo1y_999_compress
+    lzo1y_999_compress_dict
+    lzo1y_999_compress_internal
+    lzo1y_999_compress_level
+    lzo1y_decompress
+    lzo1y_decompress_dict_safe
+    lzo1y_decompress_safe
+    lzo1y_optimize
+    lzo1z_999_compress
+    lzo1z_999_compress_dict
+    lzo1z_999_compress_internal
+    lzo1z_999_compress_level
+    lzo1z_decompress
+    lzo1z_decompress_dict_safe
+    lzo1z_decompress_safe
+    lzo2a_999_compress
+    lzo2a_999_compress_callback
+    lzo2a_decompress
+    lzo2a_decompress_safe
+    lzo_adler32
+    lzo_copyright
+    lzo_crc32
+    lzo_get_crc32_table
+    lzo_memcmp
+    lzo_memcpy
+    lzo_memmove
+    lzo_memset
+    lzo_version
+    lzo_version_date
+    lzo_version_string
+    
+    

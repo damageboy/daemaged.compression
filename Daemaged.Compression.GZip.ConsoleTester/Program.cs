@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using Daemaged.Compression.GZip;
+using Daemaged.Compression.LZO2;
 using Daemaged.Compression.LZMA;
 
 namespace Daemaged.Compression.GZip.ConsoleTester
@@ -10,10 +11,23 @@ namespace Daemaged.Compression.GZip.ConsoleTester
   {
     static void Main(string[] args)
     {
+      var x = LZOTest();
       var sgz = GzipTest();
       var sxz = LZMATest();
       Console.WriteLine(sgz);
       Console.WriteLine(sxz);
+    }
+
+    private static unsafe string LZOTest()
+    {
+      var b = Encoding.ASCII.GetBytes("Just some test string to compress with gzip");
+
+      byte[] dst;
+      byte[] decomp;
+      var size = LZO2Native.LZO1x115Compress(b, out dst);
+      Console.WriteLine(size);
+      LZO2Native.lzo1x_decompress(dst, out decomp, b.Length);
+      return "";
     }
 
     private static string GzipTest()
