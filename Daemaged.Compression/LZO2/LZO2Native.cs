@@ -9,7 +9,7 @@ namespace Daemaged.Compression.LZO2
   public enum LZOMethod { M1x15, M1x999 };
 
   [SuppressUnmanagedCodeSecurity]
-  unsafe class LZO2Native
+  public unsafe class LZO2Native
   {
 #if MIXED_MODE
       internal const string LZO2 = "Daemaged.Compression.dll";
@@ -83,6 +83,28 @@ namespace Daemaged.Compression.LZO2
       }
       if (ret != 0)
         throw new LZOException(ret);
+    }
+
+    public static unsafe int LZO1x115Compress(byte[] src, int start, int count, out byte[] dst)
+    {
+      dst = new byte[count + count / 64 + 16 + 3];
+      var num = new IntPtr(0);
+      var workMem = new byte[LZO1X_1_15_MEM_COMPRESS];
+      var srcHandle = GCHandle.Alloc(src, GCHandleType.Pinned);
+      var dstHandle = GCHandle.Alloc(dst, GCHandleType.Pinned);
+      var workHandle = GCHandle.Alloc(workMem, GCHandleType.Pinned);
+      lzo1x_1_15_compress(((byte*)srcHandle.AddrOfPinnedObject().ToPointer()) + start, (IntPtr) count, 
+                          (byte*)dstHandle.AddrOfPinnedObject().ToPointer(), &num,
+                          (void*)workHandle.AddrOfPinnedObject());
+      srcHandle.Free();
+      dstHandle.Free();
+      workHandle.Free();
+      return num.ToInt32();
+    }
+
+    public static int LZO1x115Compress(byte[] src, out byte[] dst)
+    {
+      return LZO1x115Compress(src, 0, src.Length, out dst);
     }
 
     public class LZOException : Exception

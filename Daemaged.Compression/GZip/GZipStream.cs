@@ -5,14 +5,6 @@ using System.Security;
 
 namespace Daemaged.Compression.GZip
 {
-  /// <summary>Type of compression to use for the GZipStream. Currently only Decompress is supported.</summary>
-  public enum CompressionMode
-  {
-    /// <summary>Compresses the underlying stream.</summary>
-    Compress,
-    /// <summary>Decompresses the underlying stream.</summary>
-    Decompress,
-  }
 
   /// <summary>Provides methods and properties used to compress and decompress streams.</summary>
   [SuppressUnmanagedCodeSecurity] 
@@ -25,7 +17,7 @@ namespace Daemaged.Compression.GZip
 
     private ZStream _zstream;
 
-    private const string ZLibVersion = "1.2.4";
+    private const string ZLibVersion = "1.2.7";
 
     private bool _isDisposed;
     private readonly byte[] _tmpBuffer;

@@ -5,16 +5,6 @@ using System.Security;
 
 namespace Daemaged.Compression.LZMA
 {
-  /// <summary>Type of compression to use for the GZipStream. Currently only Decompress is supported.</summary>
-  public enum CompressionMode
-  {
-    /// <summary>Compresses the underlying stream.</summary>
-    Compress,
-    /// <summary>Decompresses the underlying stream.</summary>
-    Decompress,
-  }
-
-
   /// <summary>Provides methods and properties used to compress and decompress streams.</summary>
   [SuppressUnmanagedCodeSecurity] 
   public class LZMAStream : Stream
@@ -52,6 +42,11 @@ namespace Daemaged.Compression.LZMA
 
     public unsafe LZMAStream(Stream stream, CompressionMode mode, LZMAOptionLZMA *opts)
     { Init(stream, mode, opts); }
+
+    public unsafe LZMAStream(Stream stream, CompressionMode mode, uint preset)
+    { Init(stream, mode, preset); }
+
+
 
     public unsafe void Init(Stream stream, CompressionMode mode, LZMAOptionLZMA *opts)
     {
@@ -96,6 +91,46 @@ namespace Daemaged.Compression.LZMA
       }
 
     }
+
+    public unsafe void Init(Stream stream, CompressionMode mode, uint preset)
+    {
+      _compressedStream = stream;
+      _mode = mode;
+
+      _isClosed = false;
+
+      _zstreamBuff = new byte[sizeof(LZMAStreamNative)];
+      _zstreamHandle = GCHandle.Alloc(_zstreamBuff, GCHandleType.Pinned);
+      _zstream = (LZMAStreamNative*)_zstreamHandle.AddrOfPinnedObject().ToPointer();
+
+      _tmpBuffer = new byte[BufferSize];
+      _tmpBufferHandle = GCHandle.Alloc(_tmpBuffer, GCHandleType.Pinned);
+      _tmpBufferPtr = _tmpBufferHandle.AddrOfPinnedObject().ToPointer();
+
+      LZMAStatus ret;
+      switch (mode)
+      {
+        case CompressionMode.Compress:          
+          ret = LZMANative.lzma_easy_encoder(_zstream, preset, LZMACheck.LZMA_CHECK_CRC64);
+
+          if (ret != LZMAStatus.LZMA_OK)
+            throw new ArgumentException(string.Format("Unable to init LZMA decoder. Return code: {0}", ret));
+
+          _zstream->next_out = _tmpBufferPtr;
+          _zstream->avail_out = (IntPtr)_tmpBuffer.Length;
+
+          break;
+        case CompressionMode.Decompress:
+          ret = LZMANative.lzma_auto_decoder(_zstream, 1024 * 1024 * 1024, 0);
+
+          if (ret != LZMAStatus.LZMA_OK)
+            throw new ArgumentException(string.Format("Unable to init LZMA decoder. Return code: {0}", ret));
+          break;
+      }
+
+    }
+
+
 
     /// <summary>GZipStream destructor. Cleans all allocated resources.</summary>
     ~LZMAStream()

@@ -1,0 +1,269 @@
+LIBRARY
+; zlib data compression and ZIP file I/O library
+
+HEAPSIZE	1048576,8192
+
+EXPORTS
+        adler32                                  @1
+        compress                                 @2
+        crc32                                    @3
+        deflate                                  @4
+        deflateCopy                              @5
+        deflateEnd                               @6
+        deflateInit2_                            @7
+        deflateInit_                             @8
+        deflateParams                            @9
+        deflateReset                             @10
+        deflateSetDictionary                     @11
+        gzclose                                  @12
+        gzdopen                                  @13
+        gzerror                                  @14
+        gzflush                                  @15
+        gzopen                                   @16
+        gzread                                   @17
+        gzwrite                                  @18
+        inflate                                  @19
+        inflateEnd                               @20
+        inflateInit2_                            @21
+        inflateInit_                             @22
+        inflateReset                             @23
+        inflateSetDictionary                     @24
+        inflateSync                              @25
+        uncompress                               @26
+        zlibVersion                              @27
+        gzprintf                                 @28
+        gzputc                                   @29
+        gzgetc                                   @30
+        gzseek                                   @31
+        gzrewind                                 @32
+        gztell                                   @33
+        gzeof                                    @34
+        gzsetparams                              @35
+        zError                                   @36
+        inflateSyncPoint                         @37
+        get_crc_table                            @38
+        compress2                                @39
+        gzputs                                   @40
+        gzgets                                   @41
+        inflateCopy                              @42
+        inflateBackInit_                         @43
+        inflateBack                              @44
+        inflateBackEnd                           @45
+        compressBound                            @46
+        deflateBound                             @47
+        gzclearerr                               @48
+        gzungetc                                 @49
+        zlibCompileFlags                         @50
+        deflatePrime                             @51
+        deflatePending                           @52
+
+; zlib1 v1.2.4 added:
+        adler32_combine                         @140
+        crc32_combine                           @142
+        deflateSetHeader                        @144
+        deflateTune                             @145
+        gzbuffer                                @146
+        gzclose_r                               @147
+        gzclose_w                               @148
+        gzdirect                                @149
+        gzoffset                                @150
+        inflateGetHeader                        @156
+        inflateMark                             @157
+        inflatePrime                            @158
+        inflateReset2                           @159
+        inflateUndermine                        @160
+
+; zlib1 v1.2.6 added:
+        gzgetc_                                 @161
+        inflateResetKeep                        @163
+        deflateResetKeep                        @164
+
+; zlib1 v1.2.7 added:
+        gzopen_w                                @165
+
+
+; lzma symbols
+    lzma_alone_decoder
+    lzma_alone_encoder
+    lzma_auto_decoder
+    lzma_block_buffer_bound
+    lzma_block_buffer_decode
+    lzma_block_buffer_encode
+    lzma_block_compressed_size
+    lzma_block_decoder
+    lzma_block_encoder
+    lzma_block_header_decode
+    lzma_block_header_encode
+    lzma_block_header_size
+    lzma_block_total_size
+    lzma_block_unpadded_size
+    lzma_check_is_supported
+    lzma_check_size
+    lzma_code
+    lzma_crc32
+    lzma_crc64
+    lzma_easy_buffer_encode
+    lzma_easy_decoder_memusage
+    lzma_easy_encoder
+    lzma_easy_encoder_memusage
+    lzma_end
+    lzma_filter_decoder_is_supported
+    lzma_filter_encoder_is_supported
+    lzma_filter_flags_decode
+    lzma_filter_flags_encode
+    lzma_filter_flags_size
+    lzma_filters_copy
+    lzma_filters_update
+    lzma_get_check
+    lzma_index_append
+    lzma_index_block_count
+    lzma_index_buffer_decode
+    lzma_index_buffer_encode
+    lzma_index_cat
+    lzma_index_checks
+    lzma_index_decoder
+    lzma_index_dup
+    lzma_index_encoder
+    lzma_index_end
+    lzma_index_file_size
+    lzma_index_hash_append
+    lzma_index_hash_decode
+    lzma_index_hash_end
+    lzma_index_hash_init
+    lzma_index_hash_size
+    lzma_index_init
+    lzma_index_iter_init
+    lzma_index_iter_locate
+    lzma_index_iter_next
+    lzma_index_iter_rewind
+    lzma_index_memusage
+    lzma_index_memused
+    lzma_index_size
+    lzma_index_stream_count
+    lzma_index_stream_flags
+    lzma_index_stream_padding
+    lzma_index_stream_size
+    lzma_index_total_size
+    lzma_index_uncompressed_size
+    lzma_lzma_preset
+    lzma_memlimit_get
+    lzma_memlimit_set
+    lzma_memusage
+    lzma_mf_is_supported
+    lzma_mode_is_supported
+    lzma_physmem
+    lzma_properties_decode
+    lzma_properties_encode
+    lzma_properties_size
+    lzma_raw_buffer_decode
+    lzma_raw_buffer_encode
+    lzma_raw_decoder
+    lzma_raw_decoder_memusage
+    lzma_raw_encoder
+    lzma_raw_encoder_memusage
+    lzma_stream_buffer_bound
+    lzma_stream_buffer_decode
+    lzma_stream_buffer_encode
+    lzma_stream_decoder
+    lzma_stream_encoder
+    lzma_stream_flags_compare
+    lzma_stream_footer_decode
+    lzma_stream_footer_encode
+    lzma_stream_header_decode
+    lzma_stream_header_encode
+    lzma_version_number
+    lzma_version_string
+    lzma_vli_decode
+    lzma_vli_encode
+    lzma_vli_size        
+
+ ; LZO symbols
+    __lzo_init_v2
+    lzo1_99_compress
+    lzo1_compress
+    lzo1_decompress
+    lzo1_info
+    lzo1a_99_compress
+    lzo1a_compress
+    lzo1a_decompress
+    lzo1a_info
+    lzo1b_1_compress
+    lzo1b_2_compress
+    lzo1b_3_compress
+    lzo1b_4_compress
+    lzo1b_5_compress
+    lzo1b_6_compress
+    lzo1b_7_compress
+    lzo1b_8_compress
+    lzo1b_999_compress
+    lzo1b_999_compress_callback
+    lzo1b_99_compress
+    lzo1b_9_compress
+    lzo1b_compress
+    lzo1b_decompress
+    lzo1b_decompress_safe
+    lzo1c_1_compress
+    lzo1c_2_compress
+    lzo1c_3_compress
+    lzo1c_4_compress
+    lzo1c_5_compress
+    lzo1c_6_compress
+    lzo1c_7_compress
+    lzo1c_8_compress
+    lzo1c_999_compress
+    lzo1c_999_compress_callback
+    lzo1c_99_compress
+    lzo1c_9_compress
+    lzo1c_compress
+    lzo1c_decompress
+    lzo1c_decompress_safe
+    lzo1f_1_compress
+    lzo1f_999_compress
+    lzo1f_999_compress_callback
+    lzo1f_decompress
+    lzo1f_decompress_safe
+    lzo1x_1_11_compress
+    lzo1x_1_12_compress
+    lzo1x_1_15_compress
+    lzo1x_1_compress
+    lzo1x_999_compress
+    lzo1x_999_compress_dict
+    lzo1x_999_compress_internal
+    lzo1x_999_compress_level
+    lzo1x_decompress
+    lzo1x_decompress_dict_safe
+    lzo1x_decompress_safe
+    lzo1x_optimize
+    lzo1y_1_compress
+    lzo1y_999_compress
+    lzo1y_999_compress_dict
+    lzo1y_999_compress_internal
+    lzo1y_999_compress_level
+    lzo1y_decompress
+    lzo1y_decompress_dict_safe
+    lzo1y_decompress_safe
+    lzo1y_optimize
+    lzo1z_999_compress
+    lzo1z_999_compress_dict
+    lzo1z_999_compress_internal
+    lzo1z_999_compress_level
+    lzo1z_decompress
+    lzo1z_decompress_dict_safe
+    lzo1z_decompress_safe
+    lzo2a_999_compress
+    lzo2a_999_compress_callback
+    lzo2a_decompress
+    lzo2a_decompress_safe
+    lzo_adler32
+    lzo_copyright
+    lzo_crc32
+    lzo_get_crc32_table
+    lzo_memcmp
+    lzo_memcpy
+    lzo_memmove
+    lzo_memset
+    lzo_version
+    lzo_version_date
+    lzo_version_string
+    
+    

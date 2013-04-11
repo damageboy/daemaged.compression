@@ -8,8 +8,8 @@
     <ProjectGuid>{174D6A1D-4738-4DE6-A897-66AEBBE93854}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Daemaged.Compression.GZip.ConsoleTester</RootNamespace>
-    <AssemblyName>Daemaged.Compression.GZip.ConsoleTester</AssemblyName>
+    <RootNamespace>Daemaged.Compression.ConsoleTester</RootNamespace>
+    <AssemblyName>Daemaged.Compression.ConsoleTester</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -100,7 +100,10 @@
     <CodeAnalysisRuleDirectories>;C:\dev\vs10\Team Tools\Static Analysis Tools\FxCop\\Rules;C:\dev\vs10\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Daemaged.Compression, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b3a9ec458dbe17ef, processorArchitecture=AMD64" />
+    <Reference Include="Daemaged.Compression, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b3a9ec458dbe17ef, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Volumes\Data\projects\private\daemaged.compression.git\bin\Release-x64\Daemaged.Compression.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

@@ -251,8 +251,14 @@ namespace Daemaged.Compression.LZMA
                                                                      byte* out_buff, IntPtr* out_pos, IntPtr out_size);
   }
 
-  [StructLayout(LayoutKind.Sequential, Pack = 8, Size = 0)]
-  public unsafe struct LZMAFilter {
+#if AMD64
+  [StructLayout(LayoutKind.Sequential, Pack = 8)]
+#endif
+#if I386
+  [StructLayout(LayoutKind.Sequential, Pack = 4)]
+#endif
+  public unsafe struct LZMAFilter
+  {
     /**
      * Filter ID
      *
@@ -312,8 +318,12 @@ namespace Daemaged.Compression.LZMA
    */
     private void* reserved_ptr1;
     private void* reserved_ptr2;
+    private void* reserved_ptr3;
+    private void* reserved_ptr4;
     private ulong reserved_int1;
     private ulong reserved_int2;
+    private IntPtr reserved_int3;
+    private IntPtr reserved_int4;
     private uint reserved_enum1;
     private uint reserved_enum2;
   }
@@ -958,8 +968,6 @@ namespace Daemaged.Compression.LZMA
     * with the currently supported options, so it is safe to leave these
     * uninitialized.
     */
-    private void* reserved_ptr1;
-    private void* reserved_ptr2;
     private uint reserved_int1;
     private uint reserved_int2;
     private uint reserved_int3;
@@ -972,6 +980,8 @@ namespace Daemaged.Compression.LZMA
     private uint reserved_enum2;
     private uint reserved_enum3;
     private uint reserved_enum4;
+    private void* reserved_ptr1;
+    private void* reserved_ptr2;
 
     public uint LiteralPositionBits
     {

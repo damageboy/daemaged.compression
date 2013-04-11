@@ -126,6 +126,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompressionMode.cs" />
     <Compile Include="GZip\GZipFileStream.cs" />
     <Compile Include="GZip\GZipOptions.cs" />
     <Compile Include="GZip\GZipStream.cs" />
