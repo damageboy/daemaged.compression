@@ -13,8 +13,8 @@ namespace Daemaged.Compression.ConsoleTester
     static void Main(string[] args)
     {
       //var x = LZOTest();
-      var sgz = GzipTest();
-      Console.WriteLine(sgz);
+      //var sgz = GzipTest();
+      //Console.WriteLine(sgz);
       var sxz = LZMATest();      
       Console.WriteLine(sxz);
     }
@@ -39,10 +39,10 @@ namespace Daemaged.Compression.ConsoleTester
                 {CloseUnderlyingStream = true};
       var b = Encoding.ASCII.GetBytes("Just some test string to compress with gzip");
       z.Write(b, 0, b.Length);
-      z.Reset();
-      z.Write(b, 0, b.Length);
+      //z.Reset();
+      //z.Write(b, 0, b.Length);
       z.Close();
-
+      return "";
       var t = new GZipStream(new FileStream("test.gz", FileMode.Open), CompressionMode.Decompress)
                 {CloseUnderlyingStream = true};
       t.Read(b, 0, b.Length);
@@ -71,6 +71,8 @@ namespace Daemaged.Compression.ConsoleTester
       t.Read(b, 0, b.Length);
       var s = Encoding.ASCII.GetString(b);
       Console.WriteLine("{0} bytes read, {1} bytes written", t.TotalBytesIn, t.TotalBytesOut);
+
+      Console.ReadLine();
 
       var bc = new byte[1000];
       int ip;
