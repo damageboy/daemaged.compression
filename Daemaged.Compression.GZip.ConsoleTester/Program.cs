@@ -59,8 +59,7 @@ namespace Daemaged.Compression.ConsoleTester
       Console.WriteLine("opt-size {0}", sizeof(LZMAOptionLZMA));
       Console.WriteLine("stream-size {0}", sizeof(LZMAStreamNative));
       Console.WriteLine("filter-size {0}", sizeof(LZMAFilter));
-      var z = new LZMAStream(new FileStream("test.xz", FileMode.Create), CompressionMode.Compress,
-        3)
+      var z = new LZMAStream(new FileStream("test.xz", FileMode.Create), CompressionMode.Compress, 3)
       {CloseUnderlyingStream = true};
       var b = Encoding.ASCII.GetBytes("Just some test string to compress with lzma");
       z.Write(b, 0, b.Length);

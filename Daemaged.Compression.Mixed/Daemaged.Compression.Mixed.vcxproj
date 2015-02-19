@@ -290,7 +290,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>..\lzo\x86\liblzo2.lib;..\xz\x86\libgcc.a;..\xz\x86\liblzma.a;contrib\masmx86\gvmat32.obj;contrib\masmx86\inffas32.obj;..\bin\$(Configuration)-x86\Daemaged.Compression.Managed.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\lz4\x86\liblz4.a;..\lzo2\x86\liblzo2.a;..\xz\x86\libgcc.a;..\xz\x86\liblzma.a;..\zlib\x86\libz.a;..\bin\$(Configuration)-x86\Daemaged.Compression.Managed.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
@@ -338,7 +338,7 @@
       <Culture>0x040c</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>..\lzo\x64\liblzo2.lib;..\xz\pkg\bin_x86-64\liblzma.a;contrib\masmx64\gvmat64.obj;contrib\masmx64\inffasx64.obj;..\bin\$(Configuration)-x64\Daemaged.Compression.Managed.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\lz4\x64\liblz4.a;..\lzo2\x64\liblzo2.a;..\xz\x64\liblzma.a;..\zlib\x64\libz.a;..\bin\$(Configuration)-x64\Daemaged.Compression.Managed.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\combined.def</ModuleDefinitionFile>
@@ -353,6 +353,8 @@
       <ImportLibrary>$(OutDir)\$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
       <KeyFile>..\Daemaged.Compression.snk</KeyFile>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">
@@ -489,7 +491,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>..\lzo\x86\liblzo2.lib;..\xz\x86\libgcc.a;..\xz\x86\liblzma.a;..\zlib\x86\zlib.lib;..\bin\$(Configuration)-x86\Daemaged.Compression.Managed.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\lz4\x86\liblz4.a;..\lzo2\x86\liblzo2.a;..\xz\x86\libgcc.a;..\xz\x86\liblzma.a;..\zlib\x86\libz.a;..\bin\$(Configuration)-x86\Daemaged.Compression.Managed.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -595,7 +597,7 @@
       <Culture>0x040c</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>..\lzo\x64\liblzo2.lib;..\xz\x64\liblzma.a;..\zlib\x64\zlib.lib;..\bin\$(Configuration)-x64\Daemaged.Compression.Managed.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\lz4\x64\liblz4.a;..\lzo2\x64\liblzo2.a;..\xz\x64\liblzma.a;..\zlib\x64\libz.a;..\bin\$(Configuration)-x64\Daemaged.Compression.Managed.netmodule;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -614,6 +616,8 @@
       <CLRUnmanagedCodeCheck>true</CLRUnmanagedCodeCheck>
       <DelaySign>false</DelaySign>
       <CLRImageType>ForceIJWImage</CLRImageType>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseManagedOnly|x64'">
@@ -853,9 +857,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ResourceCompile Include="zlib.rc" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="combined.def" />
   </ItemGroup>
   <ItemGroup>
@@ -863,6 +864,12 @@
       <Project>{f3ecad94-1d0f-40a6-8c7e-8d31c1921caa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="darmaged.compression.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
