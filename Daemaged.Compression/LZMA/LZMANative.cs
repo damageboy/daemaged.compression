@@ -7,6 +7,8 @@ namespace Daemaged.Compression.LZMA
   [SuppressUnmanagedCodeSecurity] 
   internal class LZMANative
   {
+    private static object _staticSyncRoot;
+    private static IntPtr _nativeModulePtr;
     public const uint LZMA_PB_MIN = 0;
     public const uint LZMA_PB_MAX = 4;
     public const uint LZMA_PB_DEFAULT = 2;
@@ -18,11 +20,26 @@ namespace Daemaged.Compression.LZMA
     public const uint LZMA_LP_DEFAULT = 0;
     public const uint LZMA_PRESET_EXTREME = 1U << 31;
 
-#if MIXED_MODE
-    internal const string LZMA = "Daemaged.Compression.dll";
-#else
-    internal const string LZMA = "liblzma";
-#endif
+    static ZLibNative()
+    {
+      Initialize();
+    }
+
+    private static void Initialize()
+    {
+      // If we're on Linux / MacOsX, just let the platform find the .so / .dylib, 
+      // non of our bussiness, for now
+      if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+        return;
+
+      lock (_staticSyncRoot) {        
+        _nativeModulePtr = Preload.Load(LIBLZMA);
+      }
+    }
+
+
+    internal const string LIBLZMA = "liblzma";
+
     internal const ulong LZMA_VLI_UNKNOWN = ulong.MaxValue;
     //LZMA1 Filter ID
     internal const ulong LZMA_FILTER_LZMA1 = 0x4000000000000001UL;
@@ -32,7 +49,7 @@ namespace Daemaged.Compression.LZMA
     internal const ulong LZMA_FILTER_DELTA = 0x03; 
 
 
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe LZMAStatus lzma_auto_decoder(LZMAStreamNative* strm, ulong memlimit, uint flags);
 
     // \brief       Encode or decode data
@@ -47,7 +64,7 @@ namespace Daemaged.Compression.LZMA
     // out what `action' values are supported by the coder. See documentation of
     // lzma_ret for the possible return values.
     //
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe LZMAStatus lzma_code(LZMAStreamNative* strm, LZMAAction action);
 
     // Free memory allocated for the coder data structures
@@ -61,13 +78,13 @@ namespace Daemaged.Compression.LZMA
     // \note        zlib indicates an error if application end()s unfinished
     //              stream structure. liblzma doesn't do this, and assumes that
     //              application knows what it is doing.
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe void lzma_end(void* strm);
 
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe LZMAStatus lzma_alone_encoder(LZMAStreamNative* strm, ref LZMAOptionLZMA options);
 
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe LZMAStatus lzma_easy_encoder(LZMAStreamNative* strm, uint preset, LZMACheck check);
 
     // Initialize .xz Stream encoder using a custom filter chain
@@ -83,7 +100,7 @@ namespace Daemaged.Compression.LZMA
     //              - LZMA_MEM_ERROR
     //              - LZMA_OPTIONS_ERROR
     //              - LZMA_PROG_ERROR
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe LZMAStatus lzma_stream_encoder(LZMAStreamNative* strm, void* filters,
                                                                LZMACheck check);
 
@@ -108,7 +125,7 @@ namespace Daemaged.Compression.LZMA
     //
     //              If this function isn't supported by *strm or some other error
     //              occurs, zero is returned.
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe ulong lzma_memusage(LZMAStreamNative* strm);
 
     // Get the current memory usage limit
@@ -119,7 +136,7 @@ namespace Daemaged.Compression.LZMA
     // \return      On success, the current memory usage limit is returned
     //              (always non-zero). On error, zero is returned.
     //
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe ulong lzma_memlimit_get(LZMAStreamNative* strm);
 
     // Set the memory usage limit
@@ -132,7 +149,7 @@ namespace Daemaged.Compression.LZMA
     //                The limit was not changed.
     //              - LZMA_PROG_ERROR: Invalid arguments, e.g. *strm doesn't
     //                support memory usage limit or memlimit was zero.
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe LZMAStatus lzma_memlimit_set(LZMAStreamNative* strm, ulong memlimit);
 
 
@@ -148,7 +165,7 @@ namespace Daemaged.Compression.LZMA
     //
     // This function is available only if LZMA1 or LZMA2 encoder has been enabled
     // when building liblzma.
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe bool lzma_lzma_preset(void* options, uint preset);
 
     ///
@@ -173,7 +190,7 @@ namespace Daemaged.Compression.LZMA
     //             uncompressible data. Currently there is no function to
     //              calculate the maximum expansion of multi-call encoding.
     ////
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe IntPtr lzma_stream_buffer_bound(IntPtr uncompressed_size);		
 
     //
@@ -215,7 +232,7 @@ namespace Daemaged.Compression.LZMA
     //             - LZMA_PROG_ERROR
     ////
 
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe LZMAStatus lzma_stream_buffer_decode(ulong* memlimit, uint flags, void* allocator, 
                                                                      void* in_buff, IntPtr* in_pos, IntPtr in_size, 
                                                                      void* out_buff, IntPtr* out_pos, IntPtr out_size);
@@ -245,7 +262,7 @@ namespace Daemaged.Compression.LZMA
     //             - LZMA_DATA_ERROR
     //             - LZMA_PROG_ERROR
     ///
-    [DllImport(LZMA, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBLZMA, CallingConvention = CallingConvention.Cdecl)]
     public static extern unsafe LZMAStatus lzma_stream_buffer_encode(LZMAFilter* filters, LZMACheck check, void* allocator,
                                                                      byte* in_buff, IntPtr in_size,
                                                                      byte* out_buff, IntPtr* out_pos, IntPtr out_size);

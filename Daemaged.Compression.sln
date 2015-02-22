@@ -1,18 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Daemaged.Compression.Mixed", "Daemaged.Compression.Mixed\Daemaged.Compression.Mixed.vcxproj", "{8FD826F8-3739-44E6-8CC8-997122E53B8D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression", "Daemaged.Compression\Daemaged.Compression.csproj", "{F3ECAD94-1D0F-40A6-8C7E-8D31C1921CAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Comoression.GZip.Tests", "Daemaged.Comoression.GZip.Tests\Daemaged.Comoression.GZip.Tests.csproj", "{242EF5ED-640E-4193-B087-A5BE0FF777EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression.Tests", "Daemaged.Compression.Tests\Daemaged.Compression.Tests.csproj", "{242EF5ED-640E-4193-B087-A5BE0FF777EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression.ConsoleTester", "Daemaged.Compression.GZip.ConsoleTester\Daemaged.Compression.ConsoleTester.csproj", "{174D6A1D-4738-4DE6-A897-66AEBBE93854}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D} = {8FD826F8-3739-44E6-8CC8-997122E53B8D}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,23 +25,6 @@ Global
 		ReleaseWithoutAsm|x86 = ReleaseWithoutAsm|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.Debug|x64.ActiveCfg = Debug|x64
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.Debug|x64.Build.0 = Debug|x64
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.Debug|x86.ActiveCfg = Debug|Win32
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.Debug|x86.Build.0 = Debug|Win32
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.Release|Any CPU.ActiveCfg = Release|Win32
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.Release|x64.ActiveCfg = Release|x64
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.Release|x64.Build.0 = Release|x64
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.Release|x86.ActiveCfg = Release|Win32
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.Release|x86.Build.0 = Release|Win32
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.ReleaseManagedOnly|Any CPU.ActiveCfg = ReleaseManagedOnly|x64
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.ReleaseManagedOnly|x64.ActiveCfg = ReleaseManagedOnly|x64
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.ReleaseManagedOnly|x86.ActiveCfg = ReleaseManagedOnly|x64
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.ReleaseWithoutAsm|Any CPU.ActiveCfg = ReleaseWithoutAsm|Win32
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.ReleaseWithoutAsm|x64.ActiveCfg = ReleaseWithoutAsm|x64
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.ReleaseWithoutAsm|x64.Build.0 = ReleaseWithoutAsm|x64
-		{8FD826F8-3739-44E6-8CC8-997122E53B8D}.ReleaseWithoutAsm|x86.ActiveCfg = ReleaseWithoutAsm|x64
 		{F3ECAD94-1D0F-40A6-8C7E-8D31C1921CAA}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{F3ECAD94-1D0F-40A6-8C7E-8D31C1921CAA}.Debug|x64.ActiveCfg = Debug|x64
 		{F3ECAD94-1D0F-40A6-8C7E-8D31C1921CAA}.Debug|x64.Build.0 = Debug|x64

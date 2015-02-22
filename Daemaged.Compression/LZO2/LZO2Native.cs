@@ -11,11 +11,7 @@ namespace Daemaged.Compression.LZO2
   [SuppressUnmanagedCodeSecurity]
   public unsafe class LZO2Native
   {
-#if MIXED_MODE
-      internal const string LZO2 = "Daemaged.Compression.dll";
-#else
-    internal const string LZO2 = "liblzo2.dll";
-#endif
+    internal const string LZO2 = "liblzo2";
 
     static LZO2Native()
     {

@@ -122,84 +122,103 @@ namespace Daemaged.Compression.GZip
     Z_VERSION_ERROR = (-6),    
   }
 
-  [SuppressUnmanagedCodeSecurity] 
+
+  [SuppressUnmanagedCodeSecurity]
   public static class ZLibNative
   {
-#if MIXED_MODE
-    internal const string ZLIB = "Daemaged.Compression.dll";
-#else
-    internal const string ZLIB = "libz";
-#endif
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    private static readonly object _staticSyncRoot = new object();
+    private static IntPtr _nativeModulePtr;
+
+
+    static ZLibNative()
+    {
+      Initialize();
+    }
+
+    private static void Initialize()
+    {
+      // If we're on Linux / MacOsX, just let the platform find the .so / .dylib, 
+      // non of our bussiness, for now
+      if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+        return;
+
+      lock (_staticSyncRoot) {        
+        _nativeModulePtr = Preload.Load(LIBZ);
+      }
+    }
+
+    internal const string LIBZ = "libz";
+
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern int deflateInit_(ref ZStream sz, int level, string vs, int size);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern ZLibReturnCode deflate(ref ZStream sz, ZLibFlush flush);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern int deflateReset(ref ZStream sz);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern int deflateEnd(ref ZStream sz);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern int inflateInit_(ref ZStream sz, string vs, int size);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern unsafe ZLibReturnCode deflateInit2_ (ref ZStream sz, int  level, int  method, int windowBits, int memLevel, int strategy, string version, int stream_size);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern unsafe ZLibReturnCode inflateInit2_(ref ZStream sz, int windowBits, string version, int stream_size);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern ZLibReturnCode inflate(ref ZStream sz, ZLibFlush flush);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern int inflateReset(ref ZStream sz);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern int inflateEnd(ref ZStream sz);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public unsafe static extern int compress(byte *dest, uint *destLen, byte* source, uint sourceLen);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public unsafe static extern int compress2(byte* dest, uint* destLen, byte* source, uint sourceLen, int level);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint compressBound (uint sourceLen);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public unsafe static extern int uncompress(byte* dest, uint* destLen, byte* source, uint sourceLen);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern IntPtr gzopen(string name, string mode);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern int gzclose(IntPtr gzFile);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static unsafe extern int gzwrite(IntPtr gzFile, byte *data, int length);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static unsafe extern int gzread(IntPtr gzFile, byte *data, int length);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern int gzgetc(IntPtr gzFile);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern int gzputc(IntPtr gzFile, int c);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint zlibCompileFlags();
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static extern string zlibVersion();
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static unsafe extern uint adler32(uint adler, byte* data, uint length);
 
-    [DllImport(ZLibNative.ZLIB, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LIBZ, CallingConvention = CallingConvention.Cdecl)]
     public static unsafe extern uint crc32(uint crc, byte* data, uint length);
   }
 }

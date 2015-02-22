@@ -1,11 +1,6 @@
-Daemaged.Compression/obj/
-Daemaged.Compression/bin/
-*.suo
-Daemaged.Compression.Mixed/obj/
-Daemaged.Compression.GZip.ConsoleTester/obj/
-Daemaged.Comoression.GZip.Tests/obj/
-*.user
-*.sdf
-*.opensdf
+obj/
 bin/
+*.suo
+*.user
 *.DotSettings
+packages/*/
