@@ -124,9 +124,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GZipStreamTests.Constructor.g.cs">
-      <DependentUpon>GZipStreamTests.cs</DependentUpon>
-    </Compile>
     <Compile Include="GZipStreamTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

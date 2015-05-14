@@ -20,7 +20,7 @@ namespace Daemaged.Compression.LZMA
     public const uint LZMA_LP_DEFAULT = 0;
     public const uint LZMA_PRESET_EXTREME = 1U << 31;
 
-    static ZLibNative()
+    static LZMANative()
     {
       Initialize();
     }
