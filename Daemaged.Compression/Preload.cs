@@ -76,13 +76,19 @@ namespace Daemaged.Compression
 
     public static IntPtr Load(string name)
     {
-      var asmDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-      if (String.IsNullOrEmpty(asmDir))
-        throw new TypeLoadException(string.Format("Failed to load {0}.{1} because the .NET assembly loation could not be determined", name, NativeExtension));
+      var nativeSearchPath = Environment.GetEnvironmentVariable("LZ4NATIVE_OVERRIDE");
 
+      if (nativeSearchPath == null || !Directory.Exists(nativeSearchPath))
+      {
+        var asmDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        if (String.IsNullOrEmpty(asmDir))
+          throw new TypeLoadException(
+            string.Format("Failed to load {0}.{1} because the .NET assembly loation could not be determined", name,
+              NativeExtension));
+        nativeSearchPath = asmDir;
+      }
 
-      var dllName = Path.Combine(asmDir, ProcessorArchitectureDirectory, name + "." + NativeExtension);
-
+      var dllName = Path.Combine(nativeSearchPath, ProcessorArchitectureDirectory, name + "." + NativeExtension);
       if (!File.Exists(dllName))
         throw new TypeLoadException(string.Format("Failed to load {0}.{1} the native module doesn't not exist", name, NativeExtension));
 
