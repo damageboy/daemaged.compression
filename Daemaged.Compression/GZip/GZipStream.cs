@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -7,7 +8,7 @@ namespace Daemaged.Compression.GZip
 {
 
   /// <summary>Provides methods and properties used to compress and decompress streams.</summary>
-  [SuppressUnmanagedCodeSecurity] 
+  [SuppressUnmanagedCodeSecurity]
   public class GZipStream : Stream
   {
     private const int BufferSize = 16384;
@@ -26,7 +27,7 @@ namespace Daemaged.Compression.GZip
     private bool _isClosed;
     private bool _writeAfterReset;
 
-    public GZipStream(Stream stream, CompressionMode mode) : 
+    public GZipStream(Stream stream, CompressionMode mode) :
       this(stream, mode, new GZipOptions())
     { }
 
@@ -34,7 +35,7 @@ namespace Daemaged.Compression.GZip
     /// <param name="stream">The stream to compress or decompress.</param>
     /// <param name="mode">One of the BZip2CompressionMode values that indicates the action to take.</param>
     /// <param name="options">The Gzip Options</param>ll
-    public unsafe GZipStream(Stream stream, CompressionMode mode, GZipOptions options) 
+    public unsafe GZipStream(Stream stream, CompressionMode mode, GZipOptions options)
     {
       if (stream == null)
         throw new ArgumentNullException("stream");
@@ -53,9 +54,9 @@ namespace Daemaged.Compression.GZip
       switch (mode)
       {
         case CompressionMode.Compress:
-          ret = ZLibNative.deflateInit2_(ref _zstream, 
-                                         options.Level, options.Method, options.WindowBits, 
-                                         options.MemoryLevel, (int) options.Strategy, 
+          ret = ZLibNative.deflateInit2_(ref _zstream,
+                                         options.Level, options.Method, options.WindowBits,
+                                         options.MemoryLevel, (int) options.Strategy,
                                          ZLibVersion, Marshal.SizeOf(typeof(ZStream)));
 
           if (ret != ZLibReturnCode.Ok)
@@ -127,6 +128,7 @@ namespace Daemaged.Compression.GZip
       if (offset < 0 || count < 0) throw new ArgumentOutOfRangeException();
       if ((offset + count) > buffer.Length) throw new ArgumentException();
       if (_isDisposed) throw new ObjectDisposedException("GZipStream");
+      Contract.EndContractBlock();
 
       fixed (byte* b = &buffer[0])
       {
@@ -139,20 +141,20 @@ namespace Daemaged.Compression.GZip
     {
       if (_isClosed)
         return;
-      _isClosed = true; 
+      _isClosed = true;
       if (_mode == CompressionMode.Compress)
       {
         if (_writeAfterReset)
           Write(null, 0, ZLibFlush.Finish);
         ZLibNative.deflateEnd(ref _zstream);
-      } else 
+      } else
         ZLibNative.inflateEnd(ref _zstream);
-      
+
       if (CloseUnderlyingStream)
         _stream.Close();
 
       _tmpBufferHandle.Free();
-      base.Close();      
+      base.Close();
     }
 
     /// <summary>Closes the current stream and releases any resources (such as sockets and file handles) associated with the current stream.</summary>
@@ -253,9 +255,9 @@ namespace Daemaged.Compression.GZip
         }
       // We go one for two reasons:
       // 1. There's still more input available
-      // 2. We're in some FLUSH/FINISH scenario 
+      // 2. We're in some FLUSH/FINISH scenario
       //    and the output buffer has no sufficient space left
-      } while ((_zstream.avail_in > 0) || 
+      } while ((_zstream.avail_in > 0) ||
                (flush != ZLibFlush.NoFlush && availOut == 0));
     }
 
@@ -263,7 +265,7 @@ namespace Daemaged.Compression.GZip
     {
       if (!CanWrite) throw new NotSupportedException();
       if (_isDisposed) throw new ObjectDisposedException("GZipStream");
-      
+
       Write(buffer, count, ZLibFlush.NoFlush);
     }
 

@@ -161,7 +161,7 @@ namespace Daemaged.Compression.Tests
     public void Decompression(
       [Values(4 * KB, 400 * KB, 4 * MB, 40 * MB)] int size,
       [Values(4 * KB, 400 * KB, 4 * MB, 40 * MB)] int bufferSize,
-      [Values(Lz4CompressionLevel.Fastest, Lz4CompressionLevel.Best)]  Lz4CompressionLevel level
+      [Values(Lz4CompressionLevel.Fastest, Lz4CompressionLevel.Best)] Lz4CompressionLevel level
       )
     {
       var uncompressedFile = PrepareFileWithRandomGarbage(size);

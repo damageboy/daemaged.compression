@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
+using Daemaged.Compression.Util;
 
 namespace Daemaged.Compression.GZip
 {
@@ -96,7 +97,7 @@ namespace Daemaged.Compression.GZip
     public unsafe byte *next_out; //28
     public uint avail_out;        //32
     public uint total_out;        //40
-    
+
     public unsafe sbyte *msg;     //48
     public unsafe void *state;    //56
 
@@ -119,7 +120,7 @@ namespace Daemaged.Compression.GZip
     Z_DATA_ERROR    = (-3),
     MemError     = (-4),
     Z_BUF_ERROR     = (-5),
-    Z_VERSION_ERROR = (-6),    
+    Z_VERSION_ERROR = (-6),
   }
 
 
@@ -137,12 +138,7 @@ namespace Daemaged.Compression.GZip
 
     private static void Initialize()
     {
-      // If we're on Linux / MacOsX, just let the platform find the .so / .dylib, 
-      // non of our bussiness, for now
-      if (Environment.OSVersion.Platform != PlatformID.Win32NT)
-        return;
-
-      lock (_staticSyncRoot) {        
+      lock (_staticSyncRoot) {
         _nativeModulePtr = Preload.Load(LIBZ);
       }
     }

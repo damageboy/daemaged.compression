@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Runtime.InteropServices;
 using System.Security;
-using Daemaged.Compression.GZip;
+using Daemaged.Compression.Util;
 
 namespace Daemaged.Compression.LZ4
 {
+  using size_t = IntPtr;
+
+
   public enum Lz4BlockSize
   {
     Default = 0,
@@ -124,7 +126,7 @@ namespace Daemaged.Compression.LZ4
   }
 
   [SuppressUnmanagedCodeSecurity]
-  public static class LZ4LibNative
+  public static class LZ4Native
   {
     private static readonly object _staticSyncRoot = new object();
     private static IntPtr _nativeModulePtr;
@@ -153,28 +155,8 @@ namespace Daemaged.Compression.LZ4
       return -1;
     }
 
-    /* unoptimized version; solves endianess & alignment issues */
-    public static unsafe void LZ4IO_writeLE32(byte* p, uint value32)
+    static LZ4Native()
     {
-      byte* dstPtr = p;
-      dstPtr[0] = (byte)value32;
-      dstPtr[1] = (byte)(value32 >> 8);
-      dstPtr[2] = (byte)(value32 >> 16);
-      dstPtr[3] = (byte)(value32 >> 24);
-    }
-
-    static LZ4LibNative()
-    {
-      Initialize();
-    }
-
-    private static void Initialize()
-    {
-      // If we're on Linux / MacOsX, just let the platform find the .so / .dylib,
-      // non of our bussiness, for now
-      if (Environment.OSVersion.Platform != PlatformID.Win32NT)
-        return;
-
       lock (_staticSyncRoot) {
         _nativeModulePtr = Preload.Load(LIBLZ4);
       }
@@ -183,45 +165,50 @@ namespace Daemaged.Compression.LZ4
     internal const string LIBLZ4 = "liblz4";
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    public unsafe static extern int LZ4F_compressFrameBound(Lz4FrameInfo *frameInfo, int srcSize, ref Lz4Preferences preferences);
+    public unsafe static extern size_t LZ4F_compressFrameBound(Lz4FrameInfo* frameInfo, size_t srcSize, Lz4Preferences* preferences);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public unsafe static extern int LZ4F_compressFrame(ref Lz4FrameInfo frameInfo, byte *dstBuffer, int dstMaxSize, byte *srcBuffer, int srcSize, ref Lz4Preferences preferences);
+    public unsafe static extern size_t LZ4F_compressFrame(byte* dstBuffer, size_t dstMaxSize, byte* srcBuffer, size_t srcSize, Lz4Preferences *preferences);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public static extern unsafe Lz4LibReturnCode LZ4F_createCompressionContext(void **compressionContext, uint version);
+    public static extern unsafe size_t LZ4F_createCompressionContext(void** ctx, uint version);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public static extern unsafe Lz4LibReturnCode LZ4F_freeCompressionContext(void* compressionContext);
+    public static extern unsafe size_t LZ4F_freeCompressionContext(void* ctx);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public static extern unsafe int LZ4F_compressBegin(void* compressionContext, void* dstBuffer, int dstMaxSize, ref Lz4Preferences preferences);
+    public static extern unsafe size_t LZ4F_compressBegin(void* compressionContext, void* dstBuffer, size_t dstMaxSize, Lz4Preferences* preferences);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public unsafe static extern int LZ4F_compressBound(int srcSize, ref Lz4Preferences preferences);
+    public unsafe static extern size_t LZ4F_compressBound(size_t srcSize, Lz4Preferences *preferences);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public unsafe static extern int LZ4F_compressUpdate(void* compressionContext, void* dstBuffer, int dstMaxSize, void* srcBuffer, int srcSize, ref Lz4Preferences preferences);
+    public unsafe static extern size_t LZ4F_compressUpdate(void* compressionContext, void* dstBuffer, size_t dstMaxSize, void* srcBuffer, size_t srcSize, ref Lz4Preferences preferences);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public unsafe static extern int LZ4F_flush(void* compressionContext, void* dstBuffer, int dstMaxSize, ref Lz4CompressOptions compressOptions);
+    public unsafe static extern size_t LZ4F_flush(void* compressionContext, void* dstBuffer, size_t dstMaxSize, ref Lz4CompressOptions compressOptions);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public unsafe static extern int LZ4F_compressEnd(void* compressionContext, void* dstBuffer, int dstMaxSize, ref Lz4CompressOptions compressOptions);
+    public unsafe static extern size_t LZ4F_compressEnd(void* compressionContext, void* dstBuffer, size_t dstMaxSize, Lz4CompressOptions* compressOptions);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public unsafe static extern int LZ4F_isError(int size);
+    public unsafe static extern bool LZ4F_isError(size_t code);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public unsafe static extern Lz4LibReturnCode LZ4F_createDecompressionContext(void** decompressionContext, uint version);
+    public unsafe static extern sbyte* LZ4F_getErrorName(size_t code);
+
+    public static unsafe string GetErrorName(size_t code) { return new String(LZ4F_getErrorName(code)); }
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public unsafe static extern Lz4LibReturnCode LZ4F_freeDecompressionContext(void* decompressionContext);
+    public unsafe static extern size_t LZ4F_createDecompressionContext(void** decompressionContext, uint version);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public unsafe static extern Lz4LibReturnCode LZ4F_getFrameInfo(void* decompressionContext, Lz4FrameInfo *frameInfo, void* srcBuffer, int* srcSize);
+    public unsafe static extern size_t LZ4F_freeDecompressionContext(void* decompressionContext);
 
     [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
-    public unsafe static extern int LZ4F_decompress(void* decompressionContext, void* dstBuffer, int* dstMaxSize, void* srcBuffer, int* srcSize, Lz4DecompressOptions *decompressOptions);
+    public unsafe static extern size_t LZ4F_getFrameInfo(void* decompressionContext, Lz4FrameInfo* frameInfo, void* srcBuffer, int* srcSize);
+
+    [DllImport(LIBLZ4, CallingConvention = CallingConvention.Cdecl)]
+    public unsafe static extern size_t LZ4F_decompress(void* decompressionContext, void* dstBuffer, size_t* dstMaxSize, void* srcBuffer, size_t* srcSize, Lz4DecompressOptions* decompressOptions);
   }
 }

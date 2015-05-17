@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace Daemaged.Compression
+namespace Daemaged.Compression.Util
 {
   internal enum ProcessorArchitecture : ushort {
     Intel = 0,
@@ -33,10 +33,10 @@ namespace Daemaged.Compression
       {ProcessorArchitecture.IA32_on_Win64, "x86"},
       {ProcessorArchitecture.ARM, "arm"},
     };
-      
-      
-      
-      
+
+
+
+
     [DllImport("kernel32", SetLastError = true)]
     private static extern IntPtr LoadLibrary(string fileName);
 
@@ -76,7 +76,13 @@ namespace Daemaged.Compression
 
     public static IntPtr Load(string name)
     {
-      var nativeSearchPath = Environment.GetEnvironmentVariable("LZ4NATIVE_OVERRIDE");
+      var overrideVariable = "OVERRIDE_NATIVE_" + name.ToUpper();
+      var disableVariable = "DISABLE_PRELOAD_" + name.ToUpper();
+
+      if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable(disableVariable)))
+        return IntPtr.Zero;
+
+      var nativeSearchPath = Environment.GetEnvironmentVariable(overrideVariable);
 
       if (nativeSearchPath == null || !Directory.Exists(nativeSearchPath))
       {

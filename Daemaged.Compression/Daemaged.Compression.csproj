@@ -49,16 +49,18 @@
     <Compile Include="GZip\GZipOptions.cs" />
     <Compile Include="GZip\GZipStream.cs" />
     <Compile Include="LZ4\LZ4Lib.cs" />
-    <Compile Include="LZ4\LZ4LibNative.cs" />
+    <Compile Include="LZ4\LZ4Native.cs" />
     <Compile Include="LZ4\Lz4Stream.cs" />
     <Compile Include="LZMA\LZMAHelper.cs" />
     <Compile Include="LZMA\LZMANative.cs" />
     <Compile Include="LZMA\LZMAStream.cs" />
     <Compile Include="LZO2\LZO2Native.cs" />
-    <Compile Include="Preload.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GZip\ZLib.cs" />
     <Compile Include="GZip\ZLibNative.cs" />
+    <Compile Include="Util\NativeBuffer.cs" />
+    <Compile Include="Util\Preload.cs" />
+    <Compile Include="XXXX.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -76,9 +78,6 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="BZip2\" />

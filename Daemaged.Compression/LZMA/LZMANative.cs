@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Security;
+using Daemaged.Compression.Util;
 
 namespace Daemaged.Compression.LZMA
 {

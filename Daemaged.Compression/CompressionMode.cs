@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Daemaged.Compression
+﻿namespace Daemaged.Compression
 {
-  /// <summary>Type of compression to use for the GZipStream. Currently only Decompress is supported.</summary>
+  /// <summary>The mode of the compression stream</summary>
   public enum CompressionMode
   {
     /// <summary>Compresses the underlying stream.</summary>
