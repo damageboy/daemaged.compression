@@ -8,7 +8,7 @@ namespace Daemaged.Compression.GZip
   public class ZLibException : ApplicationException
   {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ZLibException"/> class with a specified 
+    /// Initializes a new instance of the <see cref="ZLibException"/> class with a specified
     /// error message and error code
     /// </summary>
     /// <param name="errorCode">The zlib error code that caused the exception</param>
@@ -19,7 +19,7 @@ namespace Daemaged.Compression.GZip
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ZLibException"/> class with a specified 
+    /// Initializes a new instance of the <see cref="ZLibException"/> class with a specified
     /// error code
     /// </summary>
     /// <param name="errorCode">The zlib error code that caused the exception</param>
@@ -62,36 +62,36 @@ namespace Daemaged.Compression.GZip
     /// <summary>
     /// True if the library is compiled with debug info
     /// </summary>
-    public bool HasDebugInfo { get { return 0 != (_flags & 0x100); } }
+    public bool HasDebugInfo => 0 != (_flags & 0x100);
 
     /// <summary>
     /// True if the library is compiled with assembly optimizations
     /// </summary>
-    public bool UsesAssemblyCode { get { return 0 != (_flags & 0x200); } }
+    public bool UsesAssemblyCode => 0 != (_flags & 0x200);
 
     /// <summary>
     /// Gets the size of the unsigned int that was compiled into Zlib
     /// </summary>
-    public int SizeOfUInt { get { return bitSize(_flags & 3); } }
+    public int SizeOfUInt => bitSize(_flags & 3);
 
     /// <summary>
     /// Gets the size of the unsigned long that was compiled into Zlib
     /// </summary>
-    public int SizeOfULong { get { return bitSize((_flags >> 2) & 3); } }
+    public int SizeOfULong => bitSize((_flags >> 2) & 3);
 
     /// <summary>
     /// Gets the size of the pointers that were compiled into Zlib
     /// </summary>
-    public int SizeOfPointer { get { return bitSize((_flags >> 4) & 3); } }
+    public int SizeOfPointer => bitSize((_flags >> 4) & 3);
 
     /// <summary>
     /// Gets the size of the z_off_t type that was compiled into Zlib
     /// </summary>
-    public int SizeOfOffset { get { return bitSize((_flags >> 6) & 3); } }
+    public int SizeOfOffset => bitSize((_flags >> 6) & 3);
 
     /// <summary>
     /// Gets the version of ZLib as a string, e.g. "1.2.1"
     /// </summary>
-    public static string Version { get { return ZLibNative.zlibVersion(); } }
+    public static string Version => ZLibNative.zlibVersion();
   }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.InteropServices;
 using Daemaged.Compression.Util;
+using static Daemaged.Compression.LZ4.LZ4Native;
 
 namespace Daemaged.Compression.LZ4
 {
@@ -12,31 +13,25 @@ namespace Daemaged.Compression.LZ4
   public class LZ4Stream : Stream, IDisposable
   {
     #region Private Members
-    static int LZ4S_GetBlockSize_FromBlockId(int id)
-    {
-      return (1 << (8 + (2*id)));
-    }
 
-    const int LZ4S_BLOCKSIZEID_DEFAULT = 7;
-
-    bool _finishedReading;
     bool _isClosed;
     bool _isDisposed;
-    int _globalBlockSizeId = LZ4S_BLOCKSIZEID_DEFAULT;
+
     ulong _nextSizeToRead;
     readonly CompressionMode _mode;
 
     NativeBuffer _srcBuffer;
     NativeBuffer _dstBuffer;
 
-    const int KB = 1024;
-    const int DecompressionBufferSize = 64*KB;
+    const int DECOMPRESSION_BUFFER_SIZE = 64*KB;
 
+    static int GetBlockSizeFromBlockId(int id) => (1 << (8 + (2 * id)));
+
+    // Used for compression/decompression
     readonly Stream _baseStream;
-    int _blockSizeBytes;
+    // Used for compression/decompression
     readonly unsafe void* _ctx;
-    readonly unsafe Lz4Preferences* _prefs;
-    int _srcPos;
+    //readonly unsafe LZ4Preferences* _prefs;
     #endregion Private Members
 
     #region Ctor
@@ -51,12 +46,17 @@ namespace Daemaged.Compression.LZ4
     /// <exception cref="LZ4Exception">
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">mode</exception>
-    public unsafe LZ4Stream(Stream baseStream, CompressionMode mode,
-      Lz4CompressionLevel level = Lz4CompressionLevel.Fastest, Lz4BlockSize blockSize = Lz4BlockSize.Max4Mb)
+    /// <exception cref="OutOfMemoryException">There is insufficient memory to satisfy the request.</exception>
+    /// <exception cref="ArgumentException">Steam compression mode contradicts base-stream read/write availability</exception>
+    public unsafe LZ4Stream(Stream baseStream, CompressionMode mode, Lz4CompressionLevel level = Lz4CompressionLevel.Fastest, LZ4BlockSize blockSize = LZ4BlockSize.Max4Mb)
     {
       if (baseStream == null) throw new ArgumentNullException(nameof(baseStream));
+      if (mode == CompressionMode.Compress && !baseStream.CanWrite)
+        throw new ArgumentException("stream is set to compress, but base-stream cannot be written to", nameof(baseStream));
+      if (mode == CompressionMode.Decompress && !baseStream.CanRead)
+        throw new ArgumentException("stream is set to decompress, but base-stream cannot be read from", nameof(baseStream));
+      Contract.EndContractBlock();
 
-      // Init
       _baseStream = baseStream;
       _mode = mode;
 
@@ -64,51 +64,46 @@ namespace Daemaged.Compression.LZ4
       size_t rc;
       switch (mode) {
         case CompressionMode.Compress:
-          rc = LZ4Native.LZ4F_createCompressionContext(&ctx, LZ4Native.Lz4Version);
+          rc = LZ4F_createCompressionContext(&ctx, Lz4Version);
           _ctx = ctx;
 
-          if (LZ4Native.LZ4F_isError(rc))
+          if (LZ4F_isError(rc))
             throw new LZ4Exception(rc);
 
-          _prefs = (Lz4Preferences*) Marshal.AllocHGlobal(sizeof (Lz4Preferences)).ToPointer();
-          _prefs->frameInfo.blockMode = Lz4BlockMode.Independent;
-          _prefs->frameInfo.blockSize = blockSize;
-          _prefs->frameInfo.contentChecksum = Lz4ContentChecksum.Enabled;
-          _prefs->autoFlush = Lz4AutoFlush.Enabled;
-          _prefs->CompressionLevel = level;
+          LZ4Preferences prefs;
+          prefs.AutoFlush = Lz4AutoFlush.Enabled;
+          prefs.CompressionLevel = level;
+          prefs.FrameInfo.BlockMode = LZ4BlockMode.Independent;
+          prefs.FrameInfo.BlockSize = blockSize;
+          prefs.FrameInfo.ContentChecksum = LZ4ContentChecksum.Enabled;
 
-          _blockSizeBytes = LZ4Native.GetBlockSize(blockSize);
+          MaxInputBufferSize = GetBlockSize(blockSize);
+          _dstBuffer = new NativeBuffer(LZ4F_compressFrameBound((IntPtr) MaxInputBufferSize).ToInt32());
 
-          _srcBuffer = new NativeBuffer(_blockSizeBytes);
-          _dstBuffer = new NativeBuffer(_blockSizeBytes);
-          //_dstBuffer = new NativeBuffer(LZ4Native.LZ4F_compressBound(_blockSizeBytes, _prefs));
-
-          var headerSize = LZ4Native.LZ4F_compressBegin(_ctx, _dstBuffer.Ptr, (IntPtr) _dstBuffer.Size, _prefs);
-          if (LZ4Native.LZ4F_isError(headerSize))
+          var headerSize = LZ4F_compressBegin(_ctx, _dstBuffer.Ptr, (IntPtr) _dstBuffer.Size, &prefs);
+          if (LZ4F_isError(headerSize))
             throw new LZ4Exception(headerSize,
-              $"File header generation failed: {LZ4Native.GetErrorName(headerSize)}");
+              $"File header generation failed: {GetErrorName(headerSize)}");
 
           _baseStream.Write(_dstBuffer.Buffer, 0, headerSize.ToInt32());
-
           break;
         case CompressionMode.Decompress:
-          rc = LZ4Native.LZ4F_createDecompressionContext(&ctx, LZ4Native.Lz4Version);
+          rc = LZ4F_createDecompressionContext(&ctx, Lz4Version);
           _ctx = ctx;
 
-          if (LZ4Native.LZ4F_isError(rc))
+          if (LZ4F_isError(rc))
             throw new LZ4Exception(rc);
 
-          _srcBuffer = new NativeBuffer(DecompressionBufferSize);
-          _dstBuffer = new NativeBuffer(DecompressionBufferSize);
+          _srcBuffer = new NativeBuffer(DECOMPRESSION_BUFFER_SIZE);
 
           baseStream.Read(_srcBuffer.Buffer, 0, sizeof (int));
 
           var outSize = 0UL;
           var inSize = (ulong) sizeof (int);
-          rc = LZ4Native.LZ4F_decompress(_ctx, _dstBuffer.Ptr, (IntPtr*) &outSize, _srcBuffer.Ptr, (IntPtr*) &inSize,
-            null);
+          var frameHeader = stackalloc byte[MAX_FRAME_HEADER_SIZE];
+          rc = LZ4F_decompress(_ctx, frameHeader, (IntPtr*) &outSize, _srcBuffer.Ptr, (IntPtr*) &inSize);
 
-          if (LZ4Native.LZ4F_isError(rc))
+          if (LZ4F_isError(rc))
             throw new LZ4Exception(rc);
 
           _nextSizeToRead = (ulong) rc;
@@ -117,21 +112,18 @@ namespace Daemaged.Compression.LZ4
           throw new ArgumentOutOfRangeException(nameof(mode), $"Unsupported mode: {mode}");
       }
     }
+
+    public int MaxInputBufferSize { get; }
     #endregion Ctor
 
     #region Stream API
-    public override bool CanRead {
-      get { return _mode == CompressionMode.Decompress; }
-    }
+    public override bool CanRead => _mode == CompressionMode.Decompress;
 
-    public override bool CanSeek {
-      get { return false; }
-    }
+    public override bool CanSeek => false;
 
-    public override bool CanWrite {
-      get { return _mode == CompressionMode.Compress; }
-    }
+    public override bool CanWrite => _mode == CompressionMode.Compress;
 
+    /// <exception cref="IOException">An I/O error occurs.</exception>
     public override void Flush()
     {
       _baseStream.Flush();
@@ -141,57 +133,59 @@ namespace Daemaged.Compression.LZ4
     /// inBuff is used to read the stream's uncompressed content
     /// outBuff is used to get the contents after the compression
     /// </summary>
-    /// <param name="buffer"></param>
-    /// <param name="offset"></param>
-    /// <param name="count"></param>
-    /// <returns></returns>
+    /// <param name="buffer">The buffer to fill with decompressed data.</param>
+    /// <param name="offset">The offset into the buffer to start filling from.</param>
+    /// <param name="count">The amount of available space in bytes in the buffer</param>
+    /// <returns>The amount of bytes written to the buffer with decompressed data</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="buffer"/> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">offset + count exceeds the length of the supplied buffer</exception>
+    /// <exception cref="ArgumentOutOfRangeException">offset cannot be negative.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">count cannot be negative.</exception>
     public override unsafe int Read(byte[] buffer, int offset, int count)
     {
-      if (buffer == null) throw new ArgumentNullException();
-      if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
-      if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "length cannot be negative");
-      if ((offset + count) > buffer.Length)
-        throw new ArgumentException("offset + count exceeds the length of the supplied buffer");
-      if (_isDisposed) throw new ObjectDisposedException(nameof(LZ4Stream));
+      if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+      if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "cannot be negative");
+      if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "cannot be negative");
+      if ((offset + count) > buffer.Length) throw new ArgumentException("offset + count exceeds the length of the supplied buffer");
       Contract.EndContractBlock();
       fixed (byte* b = &buffer[0]) {
         return Read(b + offset, count);
       }
     }
 
+    /// <exception cref="NotSupportedException">The stream must be in decompress mode to read from.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="p"/> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">length cannot be negative.</exception>
+    /// <exception cref="ObjectDisposedException">The method cannot be called after the object has been disposed.</exception>
     public unsafe int Read(byte* p, int length)
     {
-      if (!CanRead) throw new NotSupportedException();
-      if (p == null) throw new ArgumentNullException();
+      if (!CanRead) throw new NotSupportedException($"{nameof(LZ4Stream)} must be in decompress mode to read from");
+      if (p == null) throw new ArgumentNullException(nameof(p));
       if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), "length cannot be negative");
       if (_isDisposed) throw new ObjectDisposedException(nameof(LZ4Stream));
       Contract.EndContractBlock();
-
-      if (_finishedReading)
-        return 0;
 
       var decompressedSize = 0;
       var decodedBytes = (ulong) length;
 
       while (_nextSizeToRead > 0 && decompressedSize < length) {
-        int readSize;
-        _srcPos = 0;
+        if (_srcBuffer.ConsumedOffset == _srcBuffer.AvailableToRead) {
+          if (_nextSizeToRead > (ulong) _srcBuffer.Size)
+            _nextSizeToRead = (ulong) _srcBuffer.Size;
+          _srcBuffer.AvailableToRead = _baseStream.Read(_srcBuffer.Buffer, 0, (int) _nextSizeToRead);
+          _srcBuffer.ConsumedOffset = 0;
+          if (_srcBuffer.AvailableToRead == 0)
+            break;
+        }
 
-        if (_nextSizeToRead > (ulong) _srcBuffer.Size)
-          _nextSizeToRead = (ulong) _srcBuffer.Size;
-        readSize = _baseStream.Read(_srcBuffer.Buffer, 0, (int) _nextSizeToRead);
-        if (readSize == 0)
-          break;
-
-        while (_srcPos < readSize) {
-          var remaining = (ulong) (readSize - _srcPos);
+        while (_srcBuffer.ConsumedOffset < _srcBuffer.AvailableToRead) {
+          var remaining = (ulong) (_srcBuffer.AvailableToRead - _srcBuffer.ConsumedOffset);
           decodedBytes = (ulong) (length - decompressedSize);
-          var rc = LZ4Native.LZ4F_decompress(_ctx, p, (IntPtr*) &decodedBytes, _srcBuffer.Ptr + _srcPos,
-            (IntPtr*) &remaining, null);
-          if (LZ4Native.LZ4F_isError(rc))
-            throw new LZ4Exception(rc, $"Decompression error: {LZ4Native.GetErrorName(rc)}");
+          var rc = LZ4F_decompress(_ctx, p, (IntPtr*) &decodedBytes, _srcBuffer.Ptr + _srcBuffer.ConsumedOffset, (IntPtr*) &remaining, null);
+          if (LZ4F_isError(rc))
+            throw new LZ4Exception(rc, $"Decompression error: {GetErrorName(rc)}");
           _nextSizeToRead = (ulong) rc;
-          _srcPos += (int) remaining;
+          _srcBuffer.ConsumedOffset += (int) remaining;
           decompressedSize += (int) decodedBytes;
           p += decodedBytes;
           if (decompressedSize == length)
@@ -205,40 +199,76 @@ namespace Daemaged.Compression.LZ4
     /// inBuff is used to read the buffer's uncompressed content - reads block size chunks
     /// outBuff is used to get the contents after the compression and write to _basestream
     /// </summary>
-    /// <param name="buffer"></param>
-    /// <param name="offset"></param>
-    /// <param name="count"></param>
+    /// <param name="buffer">The buffer with data ready to be compressed</param>
+    /// <param name="offset">The offset into the buffer to start compressing from</param>
+    /// <param name="count">The amount of available space in bytes in the buffer</param>
+    /// <exception cref="ArgumentNullException"><paramref name=""/> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">cannot be negative.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">length cannot be negative.</exception>
+    /// <exception cref="ArgumentException">offset + count exceeds the length of the supplied buffer</exception>
     public override unsafe void Write(byte[] buffer, int offset, int count)
     {
-      if (_mode == CompressionMode.Decompress) throw new NotSupportedException("Can't write on a decompress stream!");
-
+      if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+      if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "cannot be negative");
+      if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "length cannot be negative");
+      if ((offset + count) > buffer.Length) throw new ArgumentException("offset + count exceeds the length of the supplied buffer");
+      Contract.EndContractBlock();
       if (count == 0)
         return;
-      if (count < 0)
-        throw new ArgumentOutOfRangeException(nameof(count), "Can't compress negative amount of bytes");
+
+      fixed (byte* b = &buffer[0]) {
+        Write(b + offset, count);
+      }
+    }
+
+    /// <summary>
+    /// Writes the specified buffer into the compression stream.
+    /// </summary>
+    /// <param name="p">The buffer pointer</param>
+    /// <param name="length">The length of the passed <paramref name="p"/>.</param>
+    /// <exception cref="NotSupportedException">The stream must be in compress mode to write to.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="p"/> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">length cannot be negative.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">length cannot be greater than the max block size that this <see cref="LZ4Stream"/> was constructed with.</exception>
+    /// <exception cref="ObjectDisposedException">The method cannot be called after the object has been disposed.</exception>
+    public unsafe void Write(byte* p, int length)
+    {
+      if (!CanWrite) throw new NotSupportedException("The stream must be in compress mode to write to");
+      if (p == null) throw new ArgumentNullException(nameof(p));
+      if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), "length cannot be negative");
+      //if (length > MaxInputBufferSize) throw new ArgumentOutOfRangeException(nameof(length), $"cannot be > the max block size ({MaxInputBufferSize}) that the stream was constructed with");
+      if (_isDisposed) throw new ObjectDisposedException(nameof(LZ4Stream));
       Contract.EndContractBlock();
+
+      while (length > 0) {
+        var srcBytes = (IntPtr) Math.Min(MaxInputBufferSize, length);
+        var bytesCompressed = LZ4F_compressUpdate(_ctx, _dstBuffer.Ptr, (IntPtr) _dstBuffer.Size, p, srcBytes);
+        if (LZ4F_isError(bytesCompressed))
+          throw new LZ4Exception(bytesCompressed, $"Compression failed: {GetErrorName(bytesCompressed)}");
+        p += (int) srcBytes;
+        length -= (int) srcBytes;
+        if (bytesCompressed != IntPtr.Zero)
+          _baseStream.Write(_dstBuffer.Buffer, 0, (int) bytesCompressed);
+      }
     }
 
     public override unsafe void Close()
     {
-      if (_isClosed) return;
+      if (_isClosed)
+        return;
+
       _isClosed = true;
 
       if (_mode == CompressionMode.Compress) {
         // Mark end of stream
-        var options = new Lz4CompressOptions();
-        var headerSize = LZ4Native.LZ4F_compressEnd(_ctx, _dstBuffer.Ptr, (IntPtr) _dstBuffer.Size, &options);
-        if (LZ4Native.LZ4F_isError(headerSize)) {
-          Console.WriteLine("36, End of file generation failed : " + ((Lz4LibReturnCode) headerSize));
-          Debugger.Break();
-        }
+        var endSize = LZ4F_compressEnd(_ctx, _dstBuffer.Ptr, (IntPtr) _dstBuffer.Size);
+        if (LZ4F_isError(endSize))
+          throw new LZ4Exception(endSize, $"End of file generation failed {GetErrorName(endSize)}");
+        _baseStream.Write(_dstBuffer.Buffer, 0, endSize.ToInt32());
 
-        _baseStream.Write(_dstBuffer.Buffer, 0, headerSize.ToInt32());
-
-        var rc = LZ4Native.LZ4F_freeCompressionContext(_ctx);
-        if (LZ4Native.LZ4F_isError(rc))
-          throw new LZ4Exception(rc,
-            $"Error : can't free LZ4F context resource : {LZ4Native.GetErrorName(rc)}");
+        var rc = LZ4F_freeCompressionContext(_ctx);
+        if (LZ4F_isError(rc))
+          throw new LZ4Exception(rc, $"Error : can't free LZ4F context resource: {GetErrorName(rc)}");
       } else {
         // Decompress
         var rc = LZ4Native.LZ4F_freeDecompressionContext(_ctx);

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
 
 namespace Daemaged.Compression.Util
@@ -18,17 +19,38 @@ namespace Daemaged.Compression.Util
         Ptr = (byte*) _gch.AddrOfPinnedObject().ToPointer();
       }
       catch (Exception e) {
+        Ptr = null;
+        if (_gch.IsAllocated)
+          _gch.Free();
+        Buffer = null;
         throw new Exception("Failed to initialize a new NativeBuffer", e);
       }
       Size = size;
     }
 
-    public int Size { get; private set; }
-    public byte[] Buffer { get; private set; }
-    public byte* Ptr { get; private set; }
+    public int Size { get; }
+    public byte[] Buffer { get; }
+    public byte* Ptr { get; }
     GCHandle _gch;
+    /// <summary>
+    /// Actual amount of data inside the buffer
+    /// </summary>
+    /// <value>The amount of bytes available to read.</value>
     public int AvailableToRead { get; set; }
-    public int RemainingOffset { get; set; }
+    /// <summary>
+    /// The last consumed offset within the buffer
+    /// </summary>
+    /// <value>The remaining offset.</value>
+    public int ConsumedOffset { get; set; }
+
+
+    [ContractInvariantMethod]
+    private void ObjectInvariant()
+    {
+      Contract.Invariant(Ptr == null || _gch.IsAllocated);
+      Contract.Invariant(AvailableToRead <= Size);
+      Contract.Invariant(ConsumedOffset <= AvailableToRead);
+    }
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

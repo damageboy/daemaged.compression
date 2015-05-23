@@ -21,21 +21,17 @@ namespace Daemaged.Compression.Util
     Unknown = 0xFFFF
   }
 
-  internal class Preload
+  public static class NativePreloadHelper
   {
     private static ProcessorArchitecture _processorArchitecture = ProcessorArchitecture.Unknown;
 
-    private static Dictionary<ProcessorArchitecture, string> ArchDirMapper = new Dictionary
-      <ProcessorArchitecture, string>
-    {
-      {ProcessorArchitecture.AMD64, "x64"},
-      {ProcessorArchitecture.Intel, "x86"},
-      {ProcessorArchitecture.IA32_on_Win64, "x86"},
-      {ProcessorArchitecture.ARM, "arm"},
-    };
-
-
-
+    private static readonly Dictionary<ProcessorArchitecture, string> ArchDirMapper =
+      new Dictionary<ProcessorArchitecture, string> {
+        { ProcessorArchitecture.AMD64, "x64"},
+        { ProcessorArchitecture.Intel, "x86"},
+        { ProcessorArchitecture.IA32_on_Win64, "x86"},
+        { ProcessorArchitecture.ARM, "arm"},
+      };
 
     [DllImport("kernel32", SetLastError = true)]
     private static extern IntPtr LoadLibrary(string fileName);
@@ -46,20 +42,20 @@ namespace Daemaged.Compression.Util
     [StructLayout(LayoutKind.Sequential)]
     private struct SYSTEM_INFO
     {
-      public ProcessorArchitecture wProcessorArchitecture;
-      public ushort wReserved; /* NOT USED */
-      public uint dwPageSize; /* NOT USED */
-      public IntPtr lpMinimumApplicationAddress; /* NOT USED */
-      public IntPtr lpMaximumApplicationAddress; /* NOT USED */
-      public uint dwActiveProcessorMask; /* NOT USED */
-      public uint dwNumberOfProcessors; /* NOT USED */
-      public uint dwProcessorType; /* NOT USED */
-      public uint dwAllocationGranularity; /* NOT USED */
-      public ushort wProcessorLevel; /* NOT USED */
-      public ushort wProcessorRevision; /* NOT USED */
+      public readonly ProcessorArchitecture ProcessorArchitecture;
+      readonly ushort wReserved; /* NOT USED */
+      readonly uint dwPageSize; /* NOT USED */
+      readonly IntPtr lpMinimumApplicationAddress; /* NOT USED */
+      readonly IntPtr lpMaximumApplicationAddress; /* NOT USED */
+      readonly uint dwActiveProcessorMask; /* NOT USED */
+      readonly uint dwNumberOfProcessors; /* NOT USED */
+      readonly uint dwProcessorType; /* NOT USED */
+      readonly uint dwAllocationGranularity; /* NOT USED */
+      readonly ushort wProcessorLevel; /* NOT USED */
+      readonly ushort wProcessorRevision; /* NOT USED */
     }
 
-    public static ProcessorArchitecture ProcessorArchitecture
+    static ProcessorArchitecture ProcessorArchitecture
     {
       get
       {
@@ -69,17 +65,18 @@ namespace Daemaged.Compression.Util
         SYSTEM_INFO sysInfo;
         GetSystemInfo(out sysInfo);
 
-        _processorArchitecture = sysInfo.wProcessorArchitecture;
+        _processorArchitecture = sysInfo.ProcessorArchitecture;
         return _processorArchitecture;
       }
     }
 
-    public static IntPtr Load(string name)
+    /// <exception cref="TypeLoadException">The native module could not be loaded.</exception>
+    public static IntPtr Preload(string name)
     {
       var overrideVariable = "OVERRIDE_NATIVE_" + name.ToUpper();
       var disableVariable = "DISABLE_PRELOAD_" + name.ToUpper();
 
-      if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable(disableVariable)))
+      if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable(disableVariable)))
         return IntPtr.Zero;
 
       var nativeSearchPath = Environment.GetEnvironmentVariable(overrideVariable);
@@ -87,21 +84,19 @@ namespace Daemaged.Compression.Util
       if (nativeSearchPath == null || !Directory.Exists(nativeSearchPath))
       {
         var asmDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        if (String.IsNullOrEmpty(asmDir))
-          throw new TypeLoadException(
-            string.Format("Failed to load {0}.{1} because the .NET assembly loation could not be determined", name,
-              NativeExtension));
+        if (string.IsNullOrEmpty(asmDir))
+          throw new TypeLoadException($"Failed to load {name}.{NativeExtension} because the .NET assembly location could not be determined");
         nativeSearchPath = asmDir;
       }
 
       var dllName = Path.Combine(nativeSearchPath, ProcessorArchitectureDirectory, name + "." + NativeExtension);
       if (!File.Exists(dllName))
-        throw new TypeLoadException(string.Format("Failed to load {0}.{1} the native module doesn't not exist", name, NativeExtension));
+        throw new TypeLoadException($"Failed to load {name}.{NativeExtension} the native module doesn't not exist");
 
       return LoadLibrary(dllName);
     }
 
-    public static string ProcessorArchitectureDirectory { get { return ArchDirMapper[ProcessorArchitecture]; } }
+    public static string ProcessorArchitectureDirectory => ArchDirMapper[ProcessorArchitecture];
 
     public static string NativeExtension { get { return "dll"; } }
   }

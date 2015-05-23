@@ -139,7 +139,7 @@ namespace Daemaged.Compression.GZip
     private static void Initialize()
     {
       lock (_staticSyncRoot) {
-        _nativeModulePtr = Preload.Load(LIBZ);
+        _nativeModulePtr = NativePreloadHelper.Preload(LIBZ);
       }
     }
 

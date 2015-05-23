@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Text;
+using static Daemaged.Compression.Util.NativePreloadHelper;
 
 namespace Daemaged.Compression.LZO2
 {
@@ -15,6 +15,7 @@ namespace Daemaged.Compression.LZO2
 
     static LZO2Native()
     {
+      _nativeModulePtr = Preload(LZO2);
       LZOInit();
     }
 
@@ -31,6 +32,7 @@ namespace Daemaged.Compression.LZO2
 
 
     public static readonly int LZO1X_1_15_MEM_COMPRESS = (int)(32768 * IntPtr.Size);
+    static IntPtr _nativeModulePtr;
 
     [DllImport(LZO2)]
     public static extern int lzo1x_1_15_compress(byte* src, IntPtr src_len,
@@ -89,7 +91,7 @@ namespace Daemaged.Compression.LZO2
       var srcHandle = GCHandle.Alloc(src, GCHandleType.Pinned);
       var dstHandle = GCHandle.Alloc(dst, GCHandleType.Pinned);
       var workHandle = GCHandle.Alloc(workMem, GCHandleType.Pinned);
-      lzo1x_1_15_compress(((byte*)srcHandle.AddrOfPinnedObject().ToPointer()) + start, (IntPtr) count, 
+      lzo1x_1_15_compress(((byte*)srcHandle.AddrOfPinnedObject().ToPointer()) + start, (IntPtr) count,
                           (byte*)dstHandle.AddrOfPinnedObject().ToPointer(), &num,
                           (void*)workHandle.AddrOfPinnedObject());
       srcHandle.Free();
@@ -98,10 +100,7 @@ namespace Daemaged.Compression.LZO2
       return num.ToInt32();
     }
 
-    public static int LZO1x115Compress(byte[] src, out byte[] dst)
-    {
-      return LZO1x115Compress(src, 0, src.Length, out dst);
-    }
+    public static int LZO1x115Compress(byte[] src, out byte[] dst) => LZO1x115Compress(src, 0, src.Length, out dst);
 
     public class LZOException : Exception
     {

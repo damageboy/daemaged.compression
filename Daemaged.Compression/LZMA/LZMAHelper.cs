@@ -7,11 +7,9 @@ namespace Daemaged.Compression.LZMA
 {
   public static class LZMAHelper
   {
-    public static LZMAStatus CompressBuffer(byte[] inBuff, byte[] outBuff, out int outPosition, int preset)
-    { return CompressBuffer(inBuff, inBuff.Length, 0, outBuff, outBuff.Length, 0, out outPosition, preset); }
+    public static LZMAStatus CompressBuffer(byte[] inBuff, byte[] outBuff, out int outPosition, int preset) => CompressBuffer(inBuff, inBuff.Length, 0, outBuff, outBuff.Length, 0, out outPosition, preset);
 
-    public static LZMAStatus CompressBuffer(byte[] inBuff, byte[] outBuff, out int outPosition, int preset, int delta) 
-    { return CompressBuffer(inBuff, inBuff.Length, 0, outBuff, outBuff.Length, 0, out outPosition, preset, delta); }
+    public static LZMAStatus CompressBuffer(byte[] inBuff, byte[] outBuff, out int outPosition, int preset, int delta) => CompressBuffer(inBuff, inBuff.Length, 0, outBuff, outBuff.Length, 0, out outPosition, preset, delta);
 
     public static unsafe LZMAStatus CompressBuffer(byte[] inBuff, int inLength, int inOffset, byte[] outBuff, int outLength, int outOffset, out int outPosition, int preset)
     {
@@ -53,7 +51,7 @@ namespace Daemaged.Compression.LZMA
     public static unsafe LZMAStatus CompressBuffer(void *inBuff, IntPtr inLength, void *outBuff, IntPtr outLength, out IntPtr outPosition, int preset)
     {
       var options = new LZMAOptionLZMA((uint) preset);
-      var filters = stackalloc LZMAFilter[2];      
+      var filters = stackalloc LZMAFilter[2];
       filters[0].id = LZMANative.LZMA_FILTER_LZMA2;
       filters[0].options = &options;
       filters[1].id = LZMANative.LZMA_VLI_UNKNOWN;
@@ -90,5 +88,5 @@ namespace Daemaged.Compression.LZMA
       fixed (IntPtr *op = &outPosition)
         return LZMANative.lzma_stream_buffer_decode(&memLimit, 0, null, inBuff, inp, inLength, outBuff, op, outLength);
     }
-  }       
+  }
 }

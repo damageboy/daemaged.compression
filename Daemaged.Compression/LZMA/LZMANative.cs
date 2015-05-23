@@ -34,7 +34,7 @@ namespace Daemaged.Compression.LZMA
         return;
 
       lock (_staticSyncRoot) {        
-        _nativeModulePtr = Preload.Load(LIBLZMA);
+        _nativeModulePtr = NativePreloadHelper.Preload(LIBLZMA);
       }
     }
 

@@ -82,15 +82,22 @@ namespace Daemaged.Compression.GZip
       Dispose();
     }
 
-    public unsafe int Read(byte* array, int offset, int count)
+    /// <exception cref="NotSupportedException">The stream must be in decompress mode to read from.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="p"/> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">length cannot be negative.</exception>
+    /// <exception cref="ObjectDisposedException">The method cannot be called after the object has been disposed.</exception>
+    public unsafe int Read(byte* p, int length)
     {
-      if (_mode == CompressionMode.Compress)
-        throw new NotSupportedException("Can't read on a compress stream!");
+      if (!CanRead) throw new NotSupportedException($"{nameof(GZipStream)} must be in decompress mode to read from");
+      if (p == null) throw new ArgumentNullException(nameof(p));
+      if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), "length cannot be negative");
+      if (_isDisposed) throw new ObjectDisposedException(nameof(GZipStream));
+      Contract.EndContractBlock();
 
       var exitLoop = false;
 
-      _zstream.next_out = array;
-      _zstream.avail_out = (uint) count;
+      _zstream.next_out = p;
+      _zstream.avail_out = (uint) length;
 
       while (_zstream.avail_out > 0 && exitLoop == false) {
         if (_zstream.avail_in == 0) {
@@ -106,33 +113,39 @@ namespace Daemaged.Compression.GZip
           case ZLibReturnCode.Ok:
             break;
           case ZLibReturnCode.MemError:
-            throw new OutOfMemoryException("ZLib return code: " + result);
+            throw new OutOfMemoryException($"ZLib return code: {result}");
           default:
-            throw new Exception("ZLib return code: " + result);
+            throw new Exception($"ZLib return code: {result}");
         }
       }
 
-      return (count - (int) _zstream.avail_out);
+      return (length - (int) _zstream.avail_out);
     }
 
 
-    /// <summary>Reads a number of decompressed bytes into the specified byte array.</summary>
-    /// <param name="buffer">the buffer used to store decompressed bytes</param>
-    /// <param name="offset">The location in the array to begin reading.</param>
-    /// <param name="count">The number of bytes decompressed.</param>
-    /// <returns>The number of bytes that were decompressed into the byte array. If the end of the stream has been reached, zero or the number of bytes read is returned.</returns>
+    /// <summary>
+    /// inBuff is used to read the stream's uncompressed content
+    /// outBuff is used to get the contents after the compression
+    /// </summary>
+    /// <param name="buffer"></param>
+    /// <param name="offset"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"><paramref name=""/> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The offset cannot be negative, the length cannot be negative.</exception>
+    /// <exception cref="ArgumentException">offset + count exceeds the length of the supplied buffer</exception>
+    /// <exception cref="ObjectDisposedException">The method cannot be called after the object has been disposed.</exception>
     public override unsafe int Read(byte[] buffer, int offset, int count)
     {
-      if (!CanRead) throw new NotSupportedException();
-      if (buffer == null) throw new ArgumentNullException();
-      if (offset < 0 || count < 0) throw new ArgumentOutOfRangeException();
-      if ((offset + count) > buffer.Length) throw new ArgumentException();
-      if (_isDisposed) throw new ObjectDisposedException("GZipStream");
+      if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+      if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
+      if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "length cannot be negative");
+      if ((offset + count) > buffer.Length) throw new ArgumentException("offset + count exceeds the length of the supplied buffer");
+      if (_isDisposed) throw new ObjectDisposedException(nameof(GZipStream));
       Contract.EndContractBlock();
 
-      fixed (byte* b = &buffer[0])
-      {
-        return Read(b, offset, count);
+      fixed (byte* b = &buffer[0]) {
+        return Read(b + offset, count);
       }
     }
 
@@ -174,16 +187,16 @@ namespace Daemaged.Compression.GZip
     public bool CloseUnderlyingStream { get; set; }
 
     /// <summary>Gets a value indicating whether the stream supports reading while decompressing a file.</summary>
-    public override bool CanRead { get { return (_mode == CompressionMode.Decompress ? true : false); } }
+    public override bool CanRead => (_mode == CompressionMode.Decompress);
 
     /// <summary>Gets a value indicating whether the stream supports writing.</summary>
-    public override bool CanWrite { get { return (_mode == CompressionMode.Compress ? true : false); } }
+    public override bool CanWrite => (_mode == CompressionMode.Compress);
 
     /// <summary>Gets a value indicating whether the stream supports seeking.</summary>
-    public override bool CanSeek { get { return (false); } }
+    public override bool CanSeek => false;
 
     /// <summary>Gets a reference to the underlying stream.</summary>
-    public Stream BaseStream { get { return (_stream); } }
+    public Stream BaseStream => _stream;
 
     /// <summary>Flushes the contents of the internal buffer of the current GZipStream object to the underlying stream.</summary>
     public override unsafe void Flush()
@@ -206,18 +219,19 @@ namespace Daemaged.Compression.GZip
       _isDisposed = true;
     }
 
-
     /// <summary>This property is not supported and always throws a NotSupportedException.</summary>
     /// <param name="offset">The location in the stream.</param>
     /// <param name="origin">One of the SeekOrigin values.</param>
     /// <returns>A long value.</returns>
+    /// <exception cref="NotSupportedException">Seeking is not supported in this stream type</exception>
     public override long Seek(long offset, SeekOrigin origin)
-    { throw new NotSupportedException(); }
+    { throw new NotSupportedException("Seeking is not supported in this stream type"); }
 
     /// <summary>This property is not supported and always throws a NotSupportedException.</summary>
     /// <param name="value">The length of the stream.</param>
+    /// <exception cref="NotSupportedException">The length of GZipStream cannot be set.</exception>
     public override void SetLength(long value)
-    { throw new NotSupportedException(); }
+    { throw new NotSupportedException("The length of this stream type cannot be set"); }
 
     private unsafe void Write(byte *buffer, int count, ZLibFlush flush)
     {
@@ -269,11 +283,11 @@ namespace Daemaged.Compression.GZip
       Write(buffer, count, ZLibFlush.NoFlush);
     }
 
-    //public unsafe void Write(byte* buffer, int length, int offset, int count)
-    //{ Write(buffer + offset, count, LZMAAction.LZMA_RUN); }
+    //public unsafe void Write(byte* buffer, int length, int offset, int length)
+    //{ Write(buffer + offset, length, LZMAAction.LZMA_RUN); }
     /// <summary>This property is not supported and always throws a NotSupportedException.</summary>
-    /// <param name="buffer">The array used to store compressed bytes.</param>
-    /// <param name="offset">The location in the array to begin reading.</param>
+    /// <param name="buffer">The p used to store compressed bytes.</param>
+    /// <param name="offset">The location in the p to begin reading.</param>
     /// <param name="count">The number of bytes compressed.</param>
     public override unsafe void Write(byte[] buffer, int offset, int count)
     {

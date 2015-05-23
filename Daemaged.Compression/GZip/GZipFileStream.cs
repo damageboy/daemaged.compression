@@ -53,41 +53,20 @@ namespace Daemaged.Compression.GZip
     /// <summary>
     /// Returns true of this stream can be read from, false otherwise
     /// </summary>
-    public override bool CanRead
-    {
-      get
-      {
-        return !_isWriting;
-      }
-    }
+    public override bool CanRead => !_isWriting;
 
 
     /// <summary>
     /// Returns false.
     /// </summary>
-    public override bool CanSeek
-    {
-      get
-      {
-        return false;
-      }
-    }
+    public override bool CanSeek => false;
 
-    public int Granularity
-    {
-      get { return 1; }
-    }
+    public int Granularity => 1;
 
     /// <summary>
     /// Returns true if this tsream is writeable, false otherwise
     /// </summary>
-    public override bool CanWrite
-    {
-      get
-      {
-        return _isWriting;
-      }
-    }
+    public override bool CanWrite => _isWriting;
     #endregion
 
     #region Destructor & IDispose stuff

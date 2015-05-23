@@ -50,7 +50,7 @@
     <Compile Include="GZip\GZipStream.cs" />
     <Compile Include="LZ4\LZ4Lib.cs" />
     <Compile Include="LZ4\LZ4Native.cs" />
-    <Compile Include="LZ4\Lz4Stream.cs" />
+    <Compile Include="LZ4\LZ4Stream.cs" />
     <Compile Include="LZMA\LZMAHelper.cs" />
     <Compile Include="LZMA\LZMANative.cs" />
     <Compile Include="LZMA\LZMAStream.cs" />
@@ -59,7 +59,7 @@
     <Compile Include="GZip\ZLib.cs" />
     <Compile Include="GZip\ZLibNative.cs" />
     <Compile Include="Util\NativeBuffer.cs" />
-    <Compile Include="Util\Preload.cs" />
+    <Compile Include="Util\NativePreloadHelper.cs" />
     <Compile Include="XXXX.cs" />
   </ItemGroup>
   <ItemGroup>

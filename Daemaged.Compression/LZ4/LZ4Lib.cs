@@ -11,7 +11,7 @@ namespace Daemaged.Compression.LZ4
     /// Gets the error code.
     /// </summary>
     /// <value>The error code.</value>
-    public IntPtr ErrorCode { get; private set; }
+    public IntPtr ErrorCode { get; }
     /// <summary>
     /// Initializes a new instance of the <see cref="LZ4Exception" /> class with a specified
     /// error message and error code

@@ -6,7 +6,7 @@ using System.Security;
 namespace Daemaged.Compression.LZMA
 {
   /// <summary>Provides methods and properties used to compress and decompress streams.</summary>
-  [SuppressUnmanagedCodeSecurity] 
+  [SuppressUnmanagedCodeSecurity]
   public class LZMAStream : Stream
   {
     private const int BufferSize = 16384;
@@ -14,7 +14,7 @@ namespace Daemaged.Compression.LZMA
     private Stream _compressedStream;
     private CompressionMode _mode;
 
-    private unsafe LZMAStreamNative *_zstream;    
+    private unsafe LZMAStreamNative *_zstream;
 
     private byte[] _tmpBuffer;
     private GCHandle _tmpBufferHandle;
@@ -66,13 +66,13 @@ namespace Daemaged.Compression.LZMA
       LZMAStatus ret;
       switch (mode)
       {
-        case CompressionMode.Compress:          
+        case CompressionMode.Compress:
           // We will always use one filter, + 1 to mark the end of the filter array
           var filters = stackalloc LZMAFilter[2];
           filters[0].id = LZMANative.LZMA_FILTER_LZMA2;
           filters[0].options = opts;
           filters[1].id = LZMANative.LZMA_VLI_UNKNOWN;
-          
+
           ret = LZMANative.lzma_stream_encoder(_zstream, filters, LZMACheck.LZMA_CHECK_CRC64);
 
           if (ret != LZMAStatus.LZMA_OK)
@@ -110,7 +110,7 @@ namespace Daemaged.Compression.LZMA
       LZMAStatus ret;
       switch (mode)
       {
-        case CompressionMode.Compress:          
+        case CompressionMode.Compress:
           ret = LZMANative.lzma_easy_encoder(_zstream, preset, LZMACheck.LZMA_CHECK_CRC64);
 
           if (ret != LZMAStatus.LZMA_OK)
@@ -152,7 +152,7 @@ namespace Daemaged.Compression.LZMA
     // Does the actual closing of the file handle.
     protected override void Dispose(bool isDisposing)
     {
-      if (_isDisposed) 
+      if (_isDisposed)
         return;
 
       Close();
@@ -196,7 +196,7 @@ namespace Daemaged.Compression.LZMA
         }
       }
 
-      return (count - (int) _zstream->avail_out);          
+      return (count - (int) _zstream->avail_out);
     }
 
     private unsafe void Write(byte* buffer, int count, LZMAAction action)
@@ -220,7 +220,7 @@ namespace Daemaged.Compression.LZMA
           _zstream->avail_out = (IntPtr) BufferSize;
         }
 
-        
+
         // Translate erros into specific exceptions
         switch (result) {
           case LZMAStatus.LZMA_OK:
@@ -304,30 +304,27 @@ namespace Daemaged.Compression.LZMA
     }
 
     /// <summary>Gets a value indicating whether the stream supports reading while decompressing a file.</summary>
-    public override bool CanRead { get { return (_mode == CompressionMode.Decompress ? true : false); } }
+    public override bool CanRead => (_mode == CompressionMode.Decompress ? true : false);
 
-    public int Granularity
-    {
-      get { return 1; }
-    }
+    public int Granularity => 1;
 
     /// <summary>
     /// Total bytes read by LZMA
     /// </summary>
-    public unsafe ulong TotalBytesIn { get { return _zstream->total_in; } }
+    public unsafe ulong TotalBytesIn => _zstream->total_in;
     /// <summary>
     /// Total bytes written by LZMA
     /// </summary>
-    public unsafe ulong TotalBytesOut { get { return _zstream->total_out; } }
+    public unsafe ulong TotalBytesOut => _zstream->total_out;
 
     /// <summary>Gets a value indicating whether the stream supports writing.</summary>
-    public override bool CanWrite { get { return (_mode == CompressionMode.Compress ? true : false); } }
+    public override bool CanWrite => (_mode == CompressionMode.Compress ? true : false);
 
     /// <summary>Gets a value indicating whether the stream supports seeking.</summary>
-    public override bool CanSeek { get { return (false); } }
+    public override bool CanSeek => (false);
 
     /// <summary>Gets a reference to the underlying stream.</summary>
-    public Stream BaseStream { get { return (_compressedStream); } }
+    public Stream BaseStream => (_compressedStream);
 
     #region Not yet supported
     /// <summary>Flushes the contents of the internal buffer of the current GZipStream object to the underlying stream.</summary>
