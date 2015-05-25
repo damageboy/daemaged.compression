@@ -2,7 +2,7 @@ PROJECT(LZ4 C)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "LZ4 compression library")
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
 set(CPACK_PACKAGE_VERSION_MINOR 5)
-set(CPACK_PACKAGE_VERSION_PATCH r128)
+set(CPACK_PACKAGE_VERSION_PATCH r129)
 set(VERSION_STRING	" \"${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}\" ")
 include(CPack)
 
@@ -26,7 +26,7 @@ endif()
 set(LZ4_DIR ../lib/)
 set(PRG_DIR ../programs/)
 set(LZ4_SRCS_LIB ${LZ4_DIR}lz4.c ${LZ4_DIR}lz4hc.c ${LZ4_DIR}lz4conf.h ${LZ4_DIR}lz4.h ${LZ4_DIR}lz4hc.h ${LZ4_DIR}lz4frame.c ${LZ4_DIR}lz4frame.h ${LZ4_DIR}xxhash.c)
-set(LZ4_SRCS ${LZ4_DIR}lz4frame.c ${LZ4_DIR}xxhash.c ${PRG_DIR}bench.c ${PRG_DIR}lz4cli.c ${PRG_DIR}lz4io.c)
+set(LZ4_SRCS ${LZ4_DIR}xxhash.c ${PRG_DIR}bench.c ${PRG_DIR}lz4cli.c ${PRG_DIR}lz4io.c)
 
 if(BUILD_TOOLS AND NOT BUILD_LIBS)
     set(LZ4_SRCS ${LZ4_SRCS} ${LZ4_SRCS_LIB})
@@ -41,10 +41,16 @@ if(BUILD_LIBS)
     add_library(liblz4 SHARED ${LZ4_SRCS_LIB})
     
     set_target_properties(liblz4 PROPERTIES
-    OUTPUT_NAME liblz4
+    OUTPUT_NAME lz4
     SOVERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}"
-    DEFINE_SYMBOL LZ4_DLL
+    DEFINE_SYMBOL LZ4_DLL    
     )
+    
+    if(MSVC)
+      SET_TARGET_PROPERTIES(liblz4 PROPERTIES PREFIX "lib")
+      SET_TARGET_PROPERTIES(liblz4 PROPERTIES IMPORT_PREFIX "lib")
+    endif()
+
         
     install(TARGETS liblz4
     LIBRARY DESTINATION lib
