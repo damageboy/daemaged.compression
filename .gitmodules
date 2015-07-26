@@ -1,0 +1,16 @@
+[submodule "extsrc/bzip2"]
+	path = extsrc/bzip2
+	url = git@github.com:damageboy/bzip2
+[submodule "extsrc/lzo2"]
+	path = extsrc/lzo2
+	url = git@github.com:damageboy/lzo2
+[submodule "extsrc/zlib-ng"]
+	path = extsrc/zlib-ng
+        url = git@github.com:Dead2/zlib-ng.git
+[submodule "extsrc/lz4"]
+	path = extsrc/lz4
+	url = git@github.com:damageboy/lz4
+	branch = dev
+[submodule "extsrc/xz"]
+	path = extsrc/xz
+	url = http://git.tukaani.org/xz.git
