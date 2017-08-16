@@ -9,8 +9,8 @@
         url = git@github.com:Dead2/zlib-ng.git
 [submodule "extsrc/lz4"]
 	path = extsrc/lz4
-	url = git@github.com:damageboy/lz4
+	url = https://github.com/lz4/lz4.git
 	branch = dev
 [submodule "extsrc/xz"]
 	path = extsrc/xz
-	url = http://git.tukaani.org/xz.git
+	url = https://git.tukaani.org/xz.git
