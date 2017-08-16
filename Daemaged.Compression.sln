@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression", "Daemaged.Compression\Daemaged.Compression.csproj", "{F3ECAD94-1D0F-40A6-8C7E-8D31C1921CAA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression", "src\Daemaged.Compression\Daemaged.Compression.csproj", "{F3ECAD94-1D0F-40A6-8C7E-8D31C1921CAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression.Tests", "Daemaged.Compression.Tests\Daemaged.Compression.Tests.csproj", "{242EF5ED-640E-4193-B087-A5BE0FF777EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression.Tests", "src\Daemaged.Compression.Tests\Daemaged.Compression.Tests.csproj", "{242EF5ED-640E-4193-B087-A5BE0FF777EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression.ConsoleTester", "Daemaged.Compression.GZip.ConsoleTester\Daemaged.Compression.ConsoleTester.csproj", "{174D6A1D-4738-4DE6-A897-66AEBBE93854}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression.ConsoleTester", "src\Daemaged.Compression.GZip.ConsoleTester\Daemaged.Compression.ConsoleTester.csproj", "{174D6A1D-4738-4DE6-A897-66AEBBE93854}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression.Lz4ConsoleTester", "Daemaged.Compression.Lz4ConsoleTester\Daemaged.Compression.Lz4ConsoleTester.csproj", "{B73636AC-C923-4094-9915-3CF13FE34304}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemaged.Compression.Lz4ConsoleTester", "src\Daemaged.Compression.Lz4ConsoleTester\Daemaged.Compression.Lz4ConsoleTester.csproj", "{B73636AC-C923-4094-9915-3CF13FE34304}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
