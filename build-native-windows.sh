@@ -6,18 +6,21 @@ CMAKE_PATH=/c/dev/cmake/bin
 vs=$(/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/Installer/vswhere.exe -latest | grep installationPath | cut -f 2- -d : -d " ") 
 MSBuildExePath="$vs/MSBuild/15.0/Bin/MSBuild.exe"
 
-
 export PATH=$PATH:$CMAKE_PATH
 
+X64_OUT=$PROJECT_ROOT/runtimes/win7-x64/native/
+X86_OUT=$PROJECT_ROOT/runtimes/win7-x86/native/
+
+rm -f $X86_OUT/*.dll $X64_OUT/*.dll
+
 LIBLZO2DIR=extsrc/lzo2
-LIBLZO2OUT=liblzo2
 (cd $LIBLZO2DIR && git clean -fdx && \
  cp $PROJECT_ROOT/native-cmakes/CMakeLists.lzo2.txt CMakeLists.txt && \
- mkdir build && cd build && \
+ mkdir -p build && cd build && \
  cmake .. -DCMAKE_BUILD_TYPE=RELEASE -G "Visual Studio 15 2017" && $MSBuildExePath lzo_shared.vcxproj -p:Configuration=Release &&
  cp Release/lzo2.dll $PROJECT_ROOT/$LIBLZO2OUT/x86)
 (cd $LIBLZO2DIR && git clean -fdx && \
- mkdir build && cd build && \
+ mkdir -p build && cd build && \
  cp $PROJECT_ROOT/native-cmakes/CMakeLists.lzo2.txt CMakeLists.txt && \
  cmake .. -DCMAKE_BUILD_TYPE=RELEASE -G "Visual Studio 15 2017 Win64" && $MSBuildExePath lzo_shared.vcxproj -p:Configuration=Release &&
  cp Release/lzo2.dll  $PROJECT_ROOT/$LIBLZO2OUT/x64)
