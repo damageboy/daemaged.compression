@@ -5,10 +5,12 @@ DEFAULT_CC=gcc
 X86_SFX="-m32"
 X64_SFX="-m64"
 
-X64_OUT=$PROJECT_ROOT/runtimes/ubuntu.14.04-x64/native/
 X86_OUT=$PROJECT_ROOT/runtimes/ubuntu.14.04-x86/native/
+X64_OUT=$PROJECT_ROOT/runtimes/ubuntu.14.04-x64/native/
 
 rm -f $X86_OUT/*.so $X64_OUT/*.so
+mkdir -p $X86_OUT
+mkdir -p $X64_OUT
 
 DEFAULT_FLAGS="-O3 -flto"
 
@@ -34,7 +36,7 @@ LIBBZ2DIR=extsrc/bzip2
  CC="$DEFAULT_CC $X64_SFX" cmake . -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_C_FLAGS_RELEASE="$DEFAULT_FLAGS" && make -j4 && \
  cp libbz2.so $X64_OUT)
 
-LZ4DIR=extsrc/lz4/cmake_unofficial
+LZ4DIR=extsrc/lz4/contrib/cmake_unofficial
 (cd $LZ4DIR && git clean -fdx && \
  cp $PROJECT_ROOT/native-cmakes/CMakeLists.lz4.txt CMakeLists.txt && \
  CC="$DEFAULT_CC $X86_SFX" cmake . -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_C_FLAGS_RELEASE="$DEFAULT_FLAGS" && make -j4 && \
