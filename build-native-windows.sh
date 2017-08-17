@@ -59,13 +59,13 @@ LIBZDIR=extsrc/zlib-ng
  cmake . -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RELEASE -G "Visual Studio 15 2017 Win64" && $MSBuildExePath zlib.vcxproj -p:Configuration=Release &&
  cp Release/libz.dll $X64_OUT) 
 
-exit
-
-LIBLZMADIR=extsrc/xz
-(cd $LIBLZMADIR && git clean -fdx && \
- ./autogen.sh && CC="$DEFAULT_CC $X86_SFX" CFLAGS="$DEFAULT_FLAGS" ./configure && make V=0 -j4 && \
- cp src/liblzma/.libs/liblzma.so $X86_OUT)
-(cd $LIBLZMADIR && git clean -fdx && \
- ./autogen.sh && CC="$DEFAULT_CC $X64_SFX" CFLAGS="$DEFAULT_FLAGS" ./configure && make V=0 -j4 && \
- cp src/liblzma/.libs/liblzma.so $X64_OUT)
+LIBLZMADIR=extsrc/xz/windows
+(cd $LIBLZMADIR && git clean -fdx &&
+ cp $PROJECT_ROOT/native-cmakes/liblzma_dll.vcxproj liblzma_dll.vcxproj &&
+ $MSBuildExePath liblzma_dll.vcxproj -p:Configuration=Release -p:Platform=Win32 &&
+ cp Release/Win32/liblzma_dll/liblzma.dll $X86_OUT)
+(cd $LIBLZMADIR && git clean -fdx &&
+ cp $PROJECT_ROOT/native-cmakes/liblzma_dll.vcxproj liblzma_dll.vcxproj &&
+ $MSBuildExePath liblzma_dll.vcxproj -p:Configuration=Release -p:Platform=x64 &&
+ cp Release/x64/liblzma_dll/liblzma.dll $X64_OUT)
 
