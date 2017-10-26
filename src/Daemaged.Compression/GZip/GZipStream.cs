@@ -11,21 +11,21 @@ namespace Daemaged.Compression.GZip
   [SuppressUnmanagedCodeSecurity]
   public class GZipStream : Stream
   {
-    private const int BufferSize = 16384;
+    const int BufferSize = 16384;
 
-    private readonly Stream _stream;
-    private readonly CompressionMode _mode;
+    readonly Stream _stream;
+    readonly CompressionMode _mode;
 
-    private ZStream _zstream;
+    ZStream _zstream;
 
-    private const string ZLibVersion = "1.2.7";
+    const string ZLibVersion = "1.2.7";
 
-    private bool _isDisposed;
-    private readonly byte[] _tmpBuffer;
-    private readonly GCHandle _tmpBufferHandle;
-    private readonly unsafe void* _tmpBufferPtr;
-    private bool _isClosed;
-    private bool _writeAfterReset;
+    bool _isDisposed;
+    readonly byte[] _tmpBuffer;
+    readonly GCHandle _tmpBufferHandle;
+    readonly unsafe void* _tmpBufferPtr;
+    bool _isClosed;
+    bool _writeAfterReset;
 
     public GZipStream(Stream stream, CompressionMode mode) :
       this(stream, mode, new GZipOptions())
@@ -233,7 +233,7 @@ namespace Daemaged.Compression.GZip
     public override void SetLength(long value)
     { throw new NotSupportedException("The length of this stream type cannot be set"); }
 
-    private unsafe void Write(byte *buffer, int count, ZLibFlush flush)
+    unsafe void Write(byte *buffer, int count, ZLibFlush flush)
     {
       if (_mode == CompressionMode.Decompress)
         throw new NotSupportedException("Can't write on a decompress stream!");

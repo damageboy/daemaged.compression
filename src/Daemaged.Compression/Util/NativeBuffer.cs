@@ -45,7 +45,7 @@ namespace Daemaged.Compression.Util
 
 
     [ContractInvariantMethod]
-    private void ObjectInvariant()
+    void ObjectInvariant()
     {
       Contract.Invariant(Ptr == null || _gch.IsAllocated);
       Contract.Invariant(AvailableToRead <= Size);

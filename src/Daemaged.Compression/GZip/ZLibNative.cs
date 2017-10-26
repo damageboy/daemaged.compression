@@ -127,8 +127,8 @@ namespace Daemaged.Compression.GZip
   [SuppressUnmanagedCodeSecurity]
   public static class ZLibNative
   {
-    private static readonly object _staticSyncRoot = new object();
-    private static IntPtr _nativeModulePtr;
+    static readonly object _staticSyncRoot = new object();
+    static IntPtr _nativeModulePtr;
 
 
     static ZLibNative()
@@ -136,7 +136,7 @@ namespace Daemaged.Compression.GZip
       Initialize();
     }
 
-    private static void Initialize()
+    static void Initialize()
     {
       lock (_staticSyncRoot) {
         _nativeModulePtr = NativePreloadHelper.Preload(LIBZ);

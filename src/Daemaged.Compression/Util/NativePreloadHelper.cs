@@ -23,9 +23,9 @@ namespace Daemaged.Compression.Util
 
   public static class NativePreloadHelper
   {
-    private static ProcessorArchitecture _processorArchitecture = ProcessorArchitecture.Unknown;
+    static ProcessorArchitecture _processorArchitecture = ProcessorArchitecture.Unknown;
 
-    private static readonly Dictionary<ProcessorArchitecture, string> ArchDirMapper =
+    static readonly Dictionary<ProcessorArchitecture, string> ArchDirMapper =
       new Dictionary<ProcessorArchitecture, string> {
         { ProcessorArchitecture.AMD64, "x64"},
         { ProcessorArchitecture.Intel, "x86"},
@@ -34,13 +34,13 @@ namespace Daemaged.Compression.Util
       };
 
     [DllImport("kernel32", SetLastError = true)]
-    private static extern IntPtr LoadLibrary(string fileName);
+    static extern IntPtr LoadLibrary(string fileName);
 
     [DllImport("kernel32", CallingConvention = CallingConvention.Winapi)]
-    private static extern void GetSystemInfo(out SYSTEM_INFO systemInfo);
+    static extern void GetSystemInfo(out SYSTEM_INFO systemInfo);
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct SYSTEM_INFO
+    struct SYSTEM_INFO
     {
       public readonly ProcessorArchitecture ProcessorArchitecture;
       readonly ushort wReserved; /* NOT USED */

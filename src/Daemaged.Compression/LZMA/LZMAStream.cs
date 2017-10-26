@@ -9,22 +9,22 @@ namespace Daemaged.Compression.LZMA
   [SuppressUnmanagedCodeSecurity]
   public class LZMAStream : Stream
   {
-    private const int BufferSize = 16384;
+    const int BufferSize = 16384;
 
-    private Stream _compressedStream;
-    private CompressionMode _mode;
+    Stream _compressedStream;
+    CompressionMode _mode;
 
-    private unsafe LZMAStreamNative *_zstream;
+    unsafe LZMAStreamNative *_zstream;
 
-    private byte[] _tmpBuffer;
-    private GCHandle _tmpBufferHandle;
-    private unsafe void *_tmpBufferPtr;
-    private byte[] _zstreamBuff;
-    private GCHandle _zstreamHandle;
-    private bool _wasWrittenTo;
-    private bool _isDisposed;
+    byte[] _tmpBuffer;
+    GCHandle _tmpBufferHandle;
+    unsafe void *_tmpBufferPtr;
+    byte[] _zstreamBuff;
+    GCHandle _zstreamHandle;
+    bool _wasWrittenTo;
+    bool _isDisposed;
 
-    private bool _isClosed;
+    bool _isClosed;
 
 
     public unsafe LZMAStream(Stream stream, CompressionMode mode) : this(stream, mode,  null) {}
@@ -199,7 +199,7 @@ namespace Daemaged.Compression.LZMA
       return (count - (int) _zstream->avail_out);
     }
 
-    private unsafe void Write(byte* buffer, int count, LZMAAction action)
+    unsafe void Write(byte* buffer, int count, LZMAAction action)
     {
       if (_mode == CompressionMode.Decompress)
         throw new NotSupportedException("Can't write on a decompress stream!");

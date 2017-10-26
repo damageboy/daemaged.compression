@@ -12,9 +12,9 @@ namespace Daemaged.Compression.GZip
   {
     #region Private data
     public const CompressLevel DEFAULT_COMPRESSION_LEVEL = CompressLevel.Best;
-    private readonly IntPtr _gzFile;
-    private bool _isDisposed = false;
-    private readonly bool _isWriting;
+    readonly IntPtr _gzFile;
+    bool _isDisposed = false;
+    readonly bool _isWriting;
     #endregion
 
     #region Constructors
@@ -88,7 +88,7 @@ namespace Daemaged.Compression.GZip
     }
 
     // Does the actual closing of the file handle.
-    private void CleanUp(bool isDisposing)
+    void CleanUp(bool isDisposing)
     {
       if (_isDisposed) return;
       ZLibNative.gzclose(_gzFile);

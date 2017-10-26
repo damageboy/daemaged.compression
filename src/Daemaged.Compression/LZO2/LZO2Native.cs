@@ -19,16 +19,16 @@ namespace Daemaged.Compression.LZO2
       LZOInit();
     }
 
-    private const uint LZO_VERSION = 0x2060;
+    const uint LZO_VERSION = 0x2060;
 
-    private static int LZOInit()
+    static int LZOInit()
     {
       return __lzo_init_v2(LZO_VERSION, sizeof(short), sizeof(int), IntPtr.Size, sizeof(uint), sizeof(uint), IntPtr.Size,
                     IntPtr.Size, IntPtr.Size, IntPtr.Size);
     }
 
     [DllImport(LZO2, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    private static extern int __lzo_init_v2(uint version, int szShort, int szInt, int szLong, int szLzoUint, int szUint, int szDict, int szCharP, int szVoidP, int szCallBack);
+    static extern int __lzo_init_v2(uint version, int szShort, int szInt, int szLong, int szLzoUint, int szUint, int szDict, int szCharP, int szVoidP, int szCallBack);
 
 
     public static readonly int LZO1X_1_15_MEM_COMPRESS = (int)(32768 * IntPtr.Size);
@@ -104,11 +104,11 @@ namespace Daemaged.Compression.LZO2
 
     public class LZOException : Exception
     {
-      private int _code;
+      int _code;
       internal LZOException(int code) { _code = code; }
       public override string Message { get { return MESSAGES[_code]; } }
 
-      private static Dictionary<int, string> MESSAGES = new Dictionary<int, string>()
+      static Dictionary<int, string> MESSAGES = new Dictionary<int, string>()
       {
         {-1,  "Error"},
         {-2,  "Out of memory"},

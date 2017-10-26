@@ -36,10 +36,11 @@ namespace Daemaged.Compression.GZip
   {
 
     #region Private stuff
-    private uint _flags;
+
+    uint _flags;
 
     // helper function that unpacks a bitsize mask
-    private static int bitSize(uint bits)
+    static int bitSize(uint bits)
     {
       switch (bits)
       {

@@ -71,7 +71,7 @@ namespace Daemaged.Compression.LZ4
     public LZ4ContentChecksum ContentChecksum;
     public LZ4FrameType FrameType;
     public long ContentSize;
-    private unsafe fixed uint reserved[2];
+    unsafe fixed uint reserved[2];
   }
 
   [StructLayout(LayoutKind.Sequential)]
@@ -80,7 +80,7 @@ namespace Daemaged.Compression.LZ4
     public Lz4FrameInfo FrameInfo;
     public Lz4CompressionLevel CompressionLevel;
     public Lz4AutoFlush AutoFlush;
-    private unsafe fixed uint reserved[4];
+    unsafe fixed uint reserved[4];
   }
 
 #if AMD64
@@ -125,8 +125,8 @@ namespace Daemaged.Compression.LZ4
   [SuppressUnmanagedCodeSecurity]
   public static class LZ4Native
   {
-    private static readonly object _staticSyncRoot = new object();
-    private static IntPtr _nativeModulePtr;
+    static readonly object _staticSyncRoot = new object();
+    static IntPtr _nativeModulePtr;
     internal const uint Lz4Version = 100;
     public const int HeaderMaxSize = 20;
     public const int MagicNumber = 0x184D2204;

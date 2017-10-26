@@ -8,8 +8,8 @@ namespace Daemaged.Compression.LZMA
   [SuppressUnmanagedCodeSecurity] 
   internal class LZMANative
   {
-    private static object _staticSyncRoot;
-    private static IntPtr _nativeModulePtr;
+    static object _staticSyncRoot;
+    static IntPtr _nativeModulePtr;
     public const uint LZMA_PB_MIN = 0;
     public const uint LZMA_PB_MAX = 4;
     public const uint LZMA_PB_DEFAULT = 2;
@@ -26,7 +26,7 @@ namespace Daemaged.Compression.LZMA
       Initialize();
     }
 
-    private static void Initialize()
+    static void Initialize()
     {
       // If we're on Linux / MacOsX, just let the platform find the .so / .dylib, 
       // non of our bussiness, for now
@@ -323,10 +323,10 @@ namespace Daemaged.Compression.LZMA
    * Custom memory allocation functions. Set to NULL to use
    * the standard malloc() and free().
    */
-    private void* allocator;
+    void* allocator;
 
     /** Internal state is not visible to applications. */
-    private void* internal1;
+    void* internal1;
 
     /*
    * Reserved space to allow possible future extensions without
@@ -334,16 +334,17 @@ namespace Daemaged.Compression.LZMA
    * you should not touch these, because the names of these variables
    * may change.
    */
-    private void* reserved_ptr1;
-    private void* reserved_ptr2;
-    private void* reserved_ptr3;
-    private void* reserved_ptr4;
-    private ulong reserved_int1;
-    private ulong reserved_int2;
-    private IntPtr reserved_int3;
-    private IntPtr reserved_int4;
-    private uint reserved_enum1;
-    private uint reserved_enum2;
+    void* reserved_ptr1;
+
+    void* reserved_ptr2;
+    void* reserved_ptr3;
+    void* reserved_ptr4;
+    ulong reserved_int1;
+    ulong reserved_int2;
+    IntPtr reserved_int3;
+    IntPtr reserved_int4;
+    uint reserved_enum1;
+    uint reserved_enum2;
   }
 
   public enum LZMACheck : uint
@@ -695,7 +696,7 @@ namespace Daemaged.Compression.LZMA
     }
 
     /** For now, this must always be LZMA_DELTA_TYPE_BYTE. */
-    private LZMADeltaType type;
+    LZMADeltaType type;
 
     /**
      * \brief       Delta distance
@@ -707,7 +708,7 @@ namespace Daemaged.Compression.LZMA
      *  - 16-bit stereo audio: distance = 4 bytes
      *  - 24-bit RGB image data: distance = 3 bytes
      */
-    private uint dist;
+    uint dist;
 
     /*
      * Reserved space to allow possible future extensions without
@@ -716,12 +717,13 @@ namespace Daemaged.Compression.LZMA
      * when type is LZMA_DELTA_TYPE_BYTE, so it is safe to leave these
      * uninitialized.
      */
-    private uint reserved_int1;
-    private uint reserved_int2;
-    private uint reserved_int3;
-    private uint reserved_int4;
-    private void* reserved_ptr1;
-    private void* reserved_ptr2;
+    uint reserved_int1;
+
+    uint reserved_int2;
+    uint reserved_int3;
+    uint reserved_int4;
+    void* reserved_ptr1;
+    void* reserved_ptr2;
 
   }
 
@@ -838,7 +840,7 @@ namespace Daemaged.Compression.LZMA
    * \note        When decoding, too big dictionary does no other harm
    *              than wasting memory.
    */
-    private uint dict_size;
+    uint dict_size;
 
     /**
    * \brief       Pointer to an initial dictionary
@@ -896,7 +898,7 @@ namespace Daemaged.Compression.LZMA
    * possible would be 8). It is not possible to decode such streams
    * with liblzma.
    */
-    private uint lc;
+    uint lc;
 
     /**
    * \brief       Number of literal position bits
@@ -908,7 +910,7 @@ namespace Daemaged.Compression.LZMA
    *
    * \todo        Example
    */
-    private uint lp;
+    uint lp;
 
     /**
    * \brief       Number of position bits
@@ -922,7 +924,7 @@ namespace Daemaged.Compression.LZMA
    * Example: If most of the matches occur at byte positions of
    * 8 * n + 3, that is, 3, 11, 19, ... set pb to 3, because 2**3 == 8.
    */
-    private uint pb;
+    uint pb;
 
     /** LZMA compression mode */
     public LZMAMode mode;
@@ -944,10 +946,10 @@ namespace Daemaged.Compression.LZMA
    * The exact minimum value depends on the match finder. The maximum is
    * 273, which is the maximum length of a match that LZMA can encode.
    */
-    private uint nice_len;
+    uint nice_len;
 
     /** Match finder ID */
-    private LZMAMatchFinder mf;
+    LZMAMatchFinder mf;
 
     /**
    * \brief       Maximum search depth in the match finder
@@ -977,7 +979,7 @@ namespace Daemaged.Compression.LZMA
    * malicious input could cause the match finder to slow down
    * dramatically, possibly creating a denial of service attack.
    */
-    private uint depth;
+    uint depth;
 
     /*
     * Reserved space to allow possible future extensions without
@@ -986,20 +988,21 @@ namespace Daemaged.Compression.LZMA
     * with the currently supported options, so it is safe to leave these
     * uninitialized.
     */
-    private uint reserved_int1;
-    private uint reserved_int2;
-    private uint reserved_int3;
-    private uint reserved_int4;
-    private uint reserved_int5;
-    private uint reserved_int6;
-    private uint reserved_int7;
-    private uint reserved_int8;
-    private uint reserved_enum1;
-    private uint reserved_enum2;
-    private uint reserved_enum3;
-    private uint reserved_enum4;
-    private void* reserved_ptr1;
-    private void* reserved_ptr2;
+    uint reserved_int1;
+
+    uint reserved_int2;
+    uint reserved_int3;
+    uint reserved_int4;
+    uint reserved_int5;
+    uint reserved_int6;
+    uint reserved_int7;
+    uint reserved_int8;
+    uint reserved_enum1;
+    uint reserved_enum2;
+    uint reserved_enum3;
+    uint reserved_enum4;
+    void* reserved_ptr1;
+    void* reserved_ptr2;
 
     public uint LiteralPositionBits
     {
