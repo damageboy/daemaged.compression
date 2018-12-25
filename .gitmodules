@@ -14,3 +14,6 @@
 [submodule "extsrc/xz"]
 	path = extsrc/xz
 	url = https://git.tukaani.org/xz.git
+[submodule "extsrc/zstd"]
+	path = extsrc/zstd
+	url = https://github.com/facebook/zstd.git
