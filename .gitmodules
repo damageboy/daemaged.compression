@@ -17,3 +17,6 @@
 [submodule "extsrc/zstd"]
 	path = extsrc/zstd
 	url = https://github.com/facebook/zstd.git
+[submodule "extsrc/brotli"]
+	path = extsrc/brotli
+	url = https://github.com/google/brotli.git
