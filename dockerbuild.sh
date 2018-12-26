@@ -1,5 +1,9 @@
 #!/bin/bash
 
+mkdir -p nuget.package
+
+git submodule foreach git clean -fdx && git submodule foreach git reset --hard
+
 RID=$1
 
 docker build -t $RID -f Dockerfile.$RID .
