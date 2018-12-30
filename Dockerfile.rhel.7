@@ -1,8 +1,0 @@
-FROM centos:7
-WORKDIR /nativebinaries
-
-RUN yum -y install cmake gcc gcc-c++ glibc-devel libgcc glibc-devel.i686 libgcc.i686 automake gettext-autopoint autoconf libtool make
-
-COPY . /nativebinaries/
-
-CMD ["/bin/bash", "-c", "/nativebinaries/build-native-linux.sh"]
