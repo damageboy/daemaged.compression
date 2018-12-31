@@ -5,7 +5,8 @@ variables:
   NoPackageAnalysis: true  # Suppresses warning about SemVer 2.0.0 version suffixes when packing
   CI_VERSION: $(Build.BuildNumber) # Equal to the 'name' field above.
 
-- job: nuget
+jobs:
+- job: Run CodeGen
   pool:
     vmImage: 'Ubuntu-16.04'
   
