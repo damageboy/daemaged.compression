@@ -1,0 +1,55 @@
+name: 0.6.6-ci.$(Date:yyyyMMdd).$(Rev:r)
+variables:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  NoPackageAnalysis: true  # Suppresses warning about SemVer 2.0.0 version suffixes when packing
+  CI_VERSION: $(Build.BuildNumber) # Equal to the 'name' field above.
+
+- job: nuget
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  
+  steps:
+  # Download Build Artifacts
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: native_alpine
+      downloadPath: artifacts 
+    displayName: 'Download artifacts'
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: native_debian_9
+      downloadPath: artifacts 
+    displayName: 'Download artifacts'
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: native_rhel_7
+      downloadPath: artifacts 
+    displayName: 'Download artifacts'
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: native_ubutnu_14_04
+      downloadPath: artifacts 
+    displayName: 'Download artifacts'
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: native_ubutnu_16_04
+      downloadPath: artifacts 
+    displayName: 'Download artifacts'
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: native_ubutnu_18_04
+      downloadPath: artifacts 
+    displayName: 'Download artifacts'
+
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: native_windows
+      downloadPath: artifacts 
+    displayName: 'Download artifacts'
+
