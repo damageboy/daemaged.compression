@@ -6,7 +6,7 @@ variables:
   CI_VERSION: $(Build.BuildNumber) # Equal to the 'name' field above.
 
 jobs:
-- job: Run CodeGen
+- job: CodeGen
   pool:
     vmImage: 'Ubuntu-16.04'
   
