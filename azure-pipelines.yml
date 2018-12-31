@@ -15,6 +15,7 @@ jobs:
   - task: DownloadBuildArtifacts@0
     inputs:
       artifactName: native_alpine
+      pipelineId: daemaged.compression.native
       downloadPath: artifacts 
     displayName: 'Download artifacts'
 
